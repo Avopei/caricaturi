@@ -131,38 +131,40 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
     }, []);
 
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <h2 className="text-lg font-bold text-white">1. Add photo</h2>
+        <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-black text-neutral-950">1. Add photo</h2>
 
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm leading-6 text-neutral-600">
                 Upload a portrait or take a live photo directly with your camera.
                 Supported formats: JPG, PNG, WEBP.
             </p>
 
-            <div className="mt-5 flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-slate-950/60 p-6 text-center">
+            <div className="mt-5 flex min-h-64 flex-col items-center justify-center rounded-lg border border-dashed border-neutral-400 bg-neutral-100 p-6 text-center">
                 {preview ? (
                     <img
                         src={preview}
                         alt="Original photo preview"
-                        className="max-h-72 rounded-xl object-contain"
+                        className="max-h-72 rounded-lg object-contain"
                     />
                 ) : (
                     <>
-                        <div className="mb-3 text-4xl">📷</div>
-                        <p className="font-semibold text-white">Upload or take a photo</p>
-                        <p className="mt-1 text-sm text-slate-500">Maximum 8MB</p>
+                        <div className="mb-3 h-16 w-12 rounded-t-full bg-neutral-950" />
+                        <p className="font-semibold text-neutral-950">
+                            Upload or take a photo
+                        </p>
+                        <p className="mt-1 text-sm text-neutral-500">Maximum 8MB</p>
                     </>
                 )}
             </div>
 
             {cameraError && (
-                <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                <div className="mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {cameraError}
                 </div>
             )}
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <label className="cursor-pointer rounded-xl border border-white/10 px-5 py-3 text-center font-semibold text-white hover:bg-white/10">
+                <label className="cursor-pointer rounded-lg border border-neutral-300 bg-white px-5 py-3 text-center font-semibold text-neutral-950 hover:border-black hover:bg-neutral-50">
                     Upload photo
 
                     <input
@@ -179,14 +181,14 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
                 <button
                     type="button"
                     onClick={openCamera}
-                    className="rounded-xl bg-violet-600 px-5 py-3 text-center font-semibold text-white hover:bg-violet-700"
+                    className="rounded-lg bg-black px-5 py-3 text-center font-semibold text-white hover:bg-neutral-800"
                 >
                     Take photo
                 </button>
             </div>
 
             {preview && (
-                <p className="mt-3 text-center text-xs text-slate-500">
+                <p className="mt-3 text-center text-xs text-neutral-500">
                     You can replace this image by uploading a new one or taking another
                     photo.
                 </p>
@@ -194,13 +196,13 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
 
             {cameraOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 px-4">
-                    <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950 p-5 shadow-2xl">
+                    <div className="w-full max-w-2xl rounded-xl border border-white/10 bg-neutral-950 p-5 shadow-2xl">
                         <div className="mb-4 flex items-center justify-between gap-4">
                             <div>
                                 <h3 className="text-lg font-bold text-white">
                                     Live camera
                                 </h3>
-                                <p className="text-sm text-slate-400">
+                                <p className="text-sm text-neutral-400">
                                     Position your face clearly, then capture the photo.
                                 </p>
                             </div>
@@ -208,13 +210,13 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
                             <button
                                 type="button"
                                 onClick={stopCamera}
-                                className="rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-slate-300 hover:bg-white/10"
+                                className="rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-neutral-300 hover:bg-white/10"
                             >
                                 Close
                             </button>
                         </div>
 
-                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black">
+                        <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black">
                             {!cameraReady && (
                                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-sm font-semibold text-white">
                                     Starting camera...
@@ -235,7 +237,7 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
                                 type="button"
                                 onClick={capturePhoto}
                                 disabled={!cameraReady}
-                                className="rounded-xl bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-lg bg-white px-5 py-3 font-bold text-black hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 Capture photo
                             </button>
@@ -243,7 +245,7 @@ export function ImageUploader({ preview, onFileChange }: ImageUploaderProps) {
                             <button
                                 type="button"
                                 onClick={stopCamera}
-                                className="rounded-xl border border-white/10 px-5 py-3 font-semibold text-white hover:bg-white/10"
+                                className="rounded-lg border border-white/20 px-5 py-3 font-semibold text-white hover:bg-white/10"
                             >
                                 Cancel
                             </button>

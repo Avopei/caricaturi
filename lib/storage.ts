@@ -8,6 +8,11 @@ type UploadFileToStorageInput = {
     contentType: string;
 };
 
+type DownloadedStorageFile = {
+    buffer: Buffer;
+    contentType: string;
+};
+
 export async function uploadFileToStorage({
                                               path,
                                               buffer,
@@ -58,7 +63,7 @@ export async function createSignedUrl(
     return data.signedUrl;
 }
 
-export async function downloadFileFromStorage(path: string): Promise<Buffer> {
+export async function downloadFileFromStorage(path: string): Promise<DownloadedStorageFile> {
     const supabase = createSupabaseAdminClient();
 
     const { data, error } = await supabase.storage
@@ -77,7 +82,10 @@ export async function downloadFileFromStorage(path: string): Promise<Buffer> {
 
     const arrayBuffer = await data.arrayBuffer();
 
-    return Buffer.from(arrayBuffer);
+    return {
+        buffer: Buffer.from(arrayBuffer),
+        contentType: data.type || "application/octet-stream"
+    };
 }
 
 export async function deleteFilesFromStorage(paths: string[]): Promise<void> {

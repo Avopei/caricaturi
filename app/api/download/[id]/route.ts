@@ -78,7 +78,7 @@ export async function GET(_request: Request, context: RouteContext) {
             );
         }
 
-        const fileBuffer = await downloadFileFromStorage(generation.final_image_path);
+        const file = await downloadFileFromStorage(generation.final_image_path);
 
         // Tracking download count. If this fails, download still works.
         try {
@@ -117,10 +117,10 @@ export async function GET(_request: Request, context: RouteContext) {
             console.error("DOWNLOAD_TRACKING_ERROR:", trackingError);
         }
 
-        return new NextResponse(new Uint8Array(fileBuffer), {
+        return new NextResponse(new Uint8Array(file.buffer), {
             status: 200,
             headers: {
-                "Content-Type": "image/png",
+                "Content-Type": file.contentType,
                 "Content-Disposition": `attachment; filename="caricature-${generation.id}.png"`,
                 "Cache-Control": "private, no-store"
             }

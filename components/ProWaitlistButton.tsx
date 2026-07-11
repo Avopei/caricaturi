@@ -36,20 +36,20 @@ export function ProWaitlistButton() {
     }
 
     return (
-        <div className="rounded-3xl border border-violet-200 bg-violet-50 p-5">
-            <p className="text-sm font-bold text-violet-700">Pro waitlist</p>
+        <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-5">
+            <p className="text-sm font-bold text-neutral-600">Pro waitlist</p>
 
-            <h2 className="mt-2 text-2xl font-black text-slate-950">
+            <h2 className="mt-2 text-2xl font-black text-neutral-950">
                 Get early access to Pro
             </h2>
 
-            <p className="mt-2 leading-7 text-slate-600">
+            <p className="mt-2 leading-7 text-neutral-600">
                 Join the waitlist for HD exports, no watermark, premium styles,
                 regenerate variations, and the future trained LoRA caricature model.
             </p>
 
             {joined ? (
-                <div className="mt-5 rounded-2xl bg-emerald-100 px-5 py-4 font-bold text-emerald-800">
+                <div className="mt-5 rounded-lg border border-neutral-300 bg-white px-5 py-4 font-bold text-neutral-800">
                     You are on the Pro waitlist.
                 </div>
             ) : (
@@ -57,14 +57,14 @@ export function ProWaitlistButton() {
                     type="button"
                     onClick={joinWaitlist}
                     disabled={loading}
-                    className="mt-5 rounded-2xl bg-violet-600 px-6 py-4 font-black text-white hover:bg-violet-700 disabled:opacity-50"
+                    className="mt-5 rounded-lg bg-black px-6 py-4 font-black text-white hover:bg-neutral-800 disabled:opacity-50"
                 >
                     {loading ? "Joining..." : "Join Pro waitlist"}
                 </button>
             )}
 
             {errorMessage && (
-                <p className="mt-4 rounded-xl bg-red-100 px-4 py-3 text-sm font-semibold text-red-700">
+                <p className="mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
                     {errorMessage}
                 </p>
             )}

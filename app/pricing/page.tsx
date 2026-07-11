@@ -54,23 +54,23 @@ const plans = [
 
 export default function PricingPage() {
     return (
-        <main className="min-h-screen bg-slate-950 px-5 py-10 text-white">
+        <main className="min-h-screen bg-stone-100 px-5 py-8 text-neutral-950">
             <header className="mx-auto flex max-w-7xl items-center justify-between">
                 <Link href="/" className="text-2xl font-black">
-                    PortraitLab<span className="text-violet-400"> Studio</span>
+                    PortraitLab Studio
                 </Link>
 
                 <nav className="flex items-center gap-3">
                     <Link
                         href="/"
-                        className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10"
+                        className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 hover:border-black"
                     >
                         Home
                     </Link>
 
                     <Link
                         href="/dashboard"
-                        className="rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950 hover:bg-slate-200"
+                        className="rounded-lg bg-black px-4 py-2 text-sm font-black text-white hover:bg-neutral-800"
                     >
                         Studio
                     </Link>
@@ -79,15 +79,15 @@ export default function PricingPage() {
 
             <section className="mx-auto max-w-7xl py-20">
                 <div className="mx-auto max-w-3xl text-center">
-                    <div className="mb-6 inline-flex rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm font-bold text-violet-200">
+                    <div className="mb-6 inline-flex rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-600">
                         Demo plan structure
                     </div>
 
                     <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-                        Simple plans for an MVP studio.
+                        Simple plans for a portrait studio.
                     </h1>
 
-                    <p className="mt-6 text-lg leading-8 text-slate-400">
+                    <p className="mt-6 text-lg leading-8 text-neutral-600">
                         Payments are not connected in this portfolio build. This page shows
                         the planned Free, Pro, and internal admin structure.
                     </p>
@@ -99,23 +99,18 @@ export default function PricingPage() {
                             key={plan.name}
                             className={
                                 plan.highlighted
-                                    ? "rounded-[2rem] border border-violet-500/40 bg-violet-500/10 p-8 shadow-2xl shadow-violet-950/30"
-                                    : "rounded-[2rem] border border-white/10 bg-white/[0.04] p-8"
+                                    ? "rounded-xl border border-black bg-white p-8 shadow-xl"
+                                    : "rounded-xl border border-neutral-300 bg-white p-8 shadow-sm"
                             }
                         >
-                            <div className="flex items-start justify-between gap-4">
-                                <div>
-                                    <h2 className="text-3xl font-black">{plan.name}</h2>
-                                    <p className="mt-2 text-slate-400">{plan.description}</p>
-                                </div>
-                            </div>
-
+                            <h2 className="text-3xl font-black">{plan.name}</h2>
+                            <p className="mt-2 leading-7 text-neutral-600">{plan.description}</p>
                             <p className="mt-8 text-5xl font-black">{plan.price}</p>
 
                             <ul className="mt-8 space-y-4">
                                 {plan.features.map((feature) => (
-                                    <li key={feature} className="flex gap-3 text-slate-300">
-                                        <span className="text-emerald-300">-</span>
+                                    <li key={feature} className="flex gap-3 text-neutral-700">
+                                        <span className="font-black">-</span>
                                         <span>{feature}</span>
                                     </li>
                                 ))}
@@ -125,8 +120,8 @@ export default function PricingPage() {
                                 href={plan.href}
                                 className={
                                     plan.highlighted
-                                        ? "mt-8 inline-flex w-full justify-center rounded-2xl bg-white px-6 py-4 font-black text-slate-950 hover:bg-slate-200"
-                                        : "mt-8 inline-flex w-full justify-center rounded-2xl border border-white/10 px-6 py-4 font-black text-white hover:bg-white/10"
+                                        ? "mt-8 inline-flex w-full justify-center rounded-lg bg-black px-6 py-4 font-black text-white hover:bg-neutral-800"
+                                        : "mt-8 inline-flex w-full justify-center rounded-lg border border-neutral-300 px-6 py-4 font-black text-neutral-950 hover:border-black"
                                 }
                             >
                                 {plan.cta}

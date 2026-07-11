@@ -1,5 +1,10 @@
 import BackgroundRemover from "@/components/BackgroundRemover";
+import { DashboardShell } from "@/components/DashboardShell";
 
 export default function BackgroundPage() {
-    return <BackgroundRemover />;
+    return (
+        <DashboardShell>
+            <BackgroundRemover />
+        </DashboardShell>
+    );
 }

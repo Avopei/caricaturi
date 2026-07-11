@@ -86,11 +86,11 @@ export function AdminUsersPanel() {
     }
 
     return (
-        <section className="mx-auto mt-8 max-w-7xl rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+        <section className="mx-auto mt-8 max-w-7xl rounded-xl border border-neutral-300 bg-white p-6">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
                     <h2 className="text-xl font-black">User management</h2>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-sm text-neutral-500">
                         Upgrade or downgrade users without opening Supabase.
                     </p>
                 </div>
@@ -98,25 +98,25 @@ export function AdminUsersPanel() {
                 <button
                     type="button"
                     onClick={loadUsers}
-                    className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+                    className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-950 hover:bg-neutral-100"
                 >
                     Refresh
                 </button>
             </div>
 
             {errorMessage && (
-                <div className="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                <div className="mt-5 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {errorMessage}
                 </div>
             )}
 
             {loading ? (
-                <p className="mt-6 text-sm text-slate-400">Loading users...</p>
+                <p className="mt-6 text-sm text-neutral-500">Loading users...</p>
             ) : users.length === 0 ? (
-                <p className="mt-6 text-sm text-slate-400">No users found.</p>
+                <p className="mt-6 text-sm text-neutral-500">No users found.</p>
             ) : (
-                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-                    <div className="grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr] bg-slate-900 px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-400">
+                <div className="mt-6 overflow-hidden rounded-lg border border-neutral-300">
+                    <div className="grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr] bg-neutral-100 px-4 py-3 text-xs font-black uppercase tracking-wider text-neutral-500">
                         <div>User</div>
                         <div>Plan</div>
                         <div>Free used</div>
@@ -126,22 +126,22 @@ export function AdminUsersPanel() {
                     {users.map((user) => (
                         <div
                             key={user.id}
-                            className="grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr] items-center border-t border-white/10 px-4 py-4 text-sm"
+                            className="grid grid-cols-[1.4fr_0.8fr_0.8fr_1fr] items-center border-t border-neutral-300 px-4 py-4 text-sm"
                         >
                             <div>
-                                <p className="font-bold text-white">
+                                <p className="font-bold text-neutral-950">
                                     {user.email || "No email saved"}
                                 </p>
-                                <p className="mt-1 text-xs text-slate-500">{user.id}</p>
+                                <p className="mt-1 text-xs text-neutral-500">{user.id}</p>
                             </div>
 
                             <div>
                 <span
                     className={
                         user.plan === "admin"
-                            ? "rounded-full bg-red-500/10 px-3 py-1 text-xs font-bold text-red-200"
+                            ? "rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
                             : user.plan === "pro"
-                                ? "rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200"
+                                ? "rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700"
                                 : "rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-bold text-yellow-200"
                     }
                 >
@@ -149,7 +149,7 @@ export function AdminUsersPanel() {
                 </span>
                             </div>
 
-                            <div className="text-slate-300">{user.free_generations_used}</div>
+                            <div className="text-neutral-700">{user.free_generations_used}</div>
 
                             <div>
                                 <select
@@ -157,7 +157,7 @@ export function AdminUsersPanel() {
                                     onChange={(event) =>
                                         updatePlan(user.id, event.target.value as UserPlan)
                                     }
-                                    className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:border-violet-500"
+                                    className="w-full rounded-xl border border-neutral-300 bg-neutral-50 px-3 py-2 text-neutral-950 outline-none focus:border-black"
                                 >
                                     <option value="free">free</option>
                                     <option value="pro">pro</option>

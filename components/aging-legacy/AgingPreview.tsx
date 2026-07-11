@@ -5,11 +5,30 @@ import { ImageUploader } from "@/components/ImageUploader";
 
 type AgeEffect = "10" | "20" | "30";
 
+type ImageAnalysisResult = {
+    ok: boolean;
+    orientation?: string;
+    brightness?: string;
+    contrast?: string;
+    estimatedFaceArea?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
+    estimatedHeadPose?: string;
+    expressionHint?: string;
+    promptHints?: string[];
+};
+
 const ageOptions: Array<{ value: AgeEffect; label: string }> = [
     { value: "10", label: "+10 years" },
     { value: "20", label: "+20 years" },
     { value: "30", label: "+30 years" }
 ];
+
+const promptGuidance =
+    "Create an older version of this person while preserving identity, head angle, expression, clothing and background. Add natural aging signs such as forehead lines, under-eye wrinkles, natural skin texture and subtle gray hair.";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -237,6 +256,31 @@ function applyPixelAging(
     return imageData;
 }
 
+function formatFaceArea(faceArea?: ImageAnalysisResult["estimatedFaceArea"]) {
+    if (!faceArea) return "Not available";
+
+    return `x ${Math.round(faceArea.x)}, y ${Math.round(faceArea.y)}, w ${Math.round(faceArea.width)}, h ${Math.round(faceArea.height)}`;
+}
+
+function AnalysisDetail({
+                            label,
+                            value
+                        }: {
+    label: string;
+    value?: string;
+}) {
+    return (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+            <dt className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
+                {label}
+            </dt>
+            <dd className="mt-1 text-sm font-black capitalize text-neutral-950">
+                {value || "Not available"}
+            </dd>
+        </div>
+    );
+}
+
 export default function AgingPreview() {
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
@@ -245,6 +289,9 @@ export default function AgingPreview() {
     const [errorMessage, setErrorMessage] = useState("");
     const [ageEffect, setAgeEffect] = useState<AgeEffect>("10");
     const [viewerImage, setViewerImage] = useState<string | null>(null);
+    const [analysisResult, setAnalysisResult] = useState<ImageAnalysisResult | null>(null);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [analysisError, setAnalysisError] = useState("");
 
     function handleFileChange(nextFile: File) {
         if (preview) {
@@ -256,6 +303,44 @@ export default function AgingPreview() {
         setResultImage(null);
         setErrorMessage("");
         setViewerImage(null);
+        setAnalysisResult(null);
+        setAnalysisError("");
+    }
+
+    async function analyzePortrait() {
+        if (!file) {
+            setAnalysisError("Upload an image before running Python analysis.");
+            return;
+        }
+
+        setAnalyzing(true);
+        setAnalysisError("");
+        setAnalysisResult(null);
+
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch("/api/image-analysis", {
+                method: "POST",
+                body: formData
+            });
+            const data = (await response.json()) as ImageAnalysisResult & {
+                error?: string;
+            };
+
+            if (!response.ok || data.ok === false) {
+                throw new Error(data.error || "Python analysis is unavailable.");
+            }
+
+            setAnalysisResult(data);
+        } catch {
+            setAnalysisError(
+                "Python analysis is unavailable. You can still use the aging preview."
+            );
+        } finally {
+            setAnalyzing(false);
+        }
     }
 
     async function applyAging() {
@@ -325,13 +410,16 @@ export default function AgingPreview() {
     }
 
     return (
-        <div className="min-h-[calc(100vh-7rem)] rounded-[2rem] bg-slate-950 p-4 text-white sm:p-6 lg:p-8">
+        <div className="min-h-[calc(100vh-7rem)] rounded-xl border border-neutral-300 bg-neutral-50 p-4 text-neutral-950 shadow-sm sm:p-6 lg:p-8">
             <div className="mb-6">
-                <h1 className="text-3xl font-black text-white">Aging Preview</h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-neutral-500">
+                    Studio workspace
+                </p>
+                <h1 className="mt-2 text-4xl font-black text-neutral-950 md:text-5xl">Aging Preview</h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">
                     Apply a fast artistic future-look simulation in the browser.
                 </p>
-                <p className="mt-3 inline-flex rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-sm font-semibold text-yellow-100">
+                <p className="mt-3 inline-flex rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-700">
                     This is an artistic age simulation, not a biological prediction.
                 </p>
             </div>
@@ -340,8 +428,8 @@ export default function AgingPreview() {
                 <div className="space-y-4">
                     <ImageUploader preview={preview} onFileChange={handleFileChange} />
 
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                        <h2 className="text-lg font-bold text-white">2. Choose age</h2>
+                    <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
+                        <h2 className="text-lg font-black text-neutral-950">2. Choose age</h2>
                         <div className="mt-4 grid grid-cols-3 gap-2">
                             {ageOptions.map((option) => {
                                 const selected = ageEffect === option.value;
@@ -353,8 +441,8 @@ export default function AgingPreview() {
                                         onClick={() => setAgeEffect(option.value)}
                                         className={`rounded-xl border px-3 py-2 text-sm font-bold transition ${
                                             selected
-                                                ? "border-violet-400 bg-violet-600 text-white"
-                                                : "border-white/10 text-slate-300 hover:bg-white/10"
+                                                ? "border-black bg-black text-white"
+                                                : "border-neutral-300 bg-white text-neutral-950 hover:border-black"
                                         }`}
                                     >
                                         {option.label}
@@ -364,58 +452,159 @@ export default function AgingPreview() {
                         </div>
                     </div>
 
+                    {file && (
+                        <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
+                            <h2 className="text-lg font-black text-neutral-950">
+                                3. Analyze portrait
+                            </h2>
+                            <p className="mt-1 text-sm leading-6 text-neutral-600">
+                                Optional local Python analysis for prompt guidance.
+                            </p>
+
+                            <button
+                                type="button"
+                                onClick={analyzePortrait}
+                                disabled={analyzing}
+                                className="mt-4 w-full rounded-lg border border-black bg-white px-5 py-3 text-center font-bold text-neutral-950 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {analyzing
+                                    ? "Analyzing portrait..."
+                                    : "Analyze portrait with Python"}
+                            </button>
+
+                            {analysisError && (
+                                <div className="mt-4 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700">
+                                    {analysisError}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <button
                         type="button"
                         onClick={applyAging}
                         disabled={loading}
-                        className="w-full rounded-xl bg-violet-600 px-5 py-3 text-center font-bold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="w-full rounded-lg bg-black px-5 py-3 text-center font-bold text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {loading ? "Applying aging preview..." : "Apply aging preview"}
                     </button>
 
                     {errorMessage && (
-                        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {errorMessage}
                         </div>
                     )}
                 </div>
 
-                <div className="grid gap-4 xl:grid-cols-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="space-y-4">
+                    {analysisResult && (
+                        <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
+                            <h2 className="text-lg font-black text-neutral-950">
+                                Python analysis
+                            </h2>
+
+                            <dl className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                <AnalysisDetail
+                                    label="Orientation"
+                                    value={analysisResult.orientation}
+                                />
+                                <AnalysisDetail
+                                    label="Brightness"
+                                    value={analysisResult.brightness}
+                                />
+                                <AnalysisDetail
+                                    label="Contrast"
+                                    value={analysisResult.contrast}
+                                />
+                                <AnalysisDetail
+                                    label="Head pose"
+                                    value={analysisResult.estimatedHeadPose}
+                                />
+                                <AnalysisDetail
+                                    label="Expression"
+                                    value={analysisResult.expressionHint}
+                                />
+                                <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                                    <dt className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
+                                        Face area
+                                    </dt>
+                                    <dd className="mt-1 text-sm font-black text-neutral-950">
+                                        {formatFaceArea(analysisResult.estimatedFaceArea)}
+                                    </dd>
+                                </div>
+                            </dl>
+
+                            <div className="mt-5 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                                <h3 className="text-sm font-black text-neutral-950">
+                                    Prompt hints
+                                </h3>
+                                {analysisResult.promptHints?.length ? (
+                                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-neutral-700">
+                                        {analysisResult.promptHints.map((hint) => (
+                                            <li key={hint}>{hint}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="mt-2 text-sm text-neutral-500">
+                                        No prompt hints returned.
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mt-5 rounded-lg border border-neutral-200 bg-white p-4">
+                                <h3 className="text-sm font-black text-neutral-950">
+                                    AI prompt guidance
+                                </h3>
+                                <p className="mt-2 text-sm leading-6 text-neutral-700">
+                                    {promptGuidance}
+                                </p>
+                                {analysisResult.promptHints?.length ? (
+                                    <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-neutral-700">
+                                        {analysisResult.promptHints.map((hint) => (
+                                            <li key={`guidance-${hint}`}>{hint}</li>
+                                        ))}
+                                    </ul>
+                                ) : null}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="grid gap-4 xl:grid-cols-2">
+                    <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex items-center justify-between gap-3">
-                            <h2 className="text-lg font-bold text-white">Original</h2>
+                            <h2 className="text-lg font-black text-neutral-950">Original</h2>
                             {file && (
-                                <span className="truncate text-xs text-slate-500">
+                                <span className="truncate text-xs text-neutral-500">
                                     {file.name}
                                 </span>
                             )}
                         </div>
 
-                        <div className="flex min-h-96 items-center justify-center rounded-2xl bg-black/40 p-4">
+                        <div className="flex min-h-96 items-center justify-center rounded-lg bg-neutral-100 p-4">
                             {preview ? (
                                 <img
                                     src={preview}
                                     alt="Original uploaded preview"
-                                    className="max-h-[560px] max-w-full rounded-xl object-contain"
+                                    className="max-h-[560px] max-w-full rounded-lg object-contain"
                                 />
                             ) : (
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-neutral-500">
                                     Upload an image to preview it here.
                                 </p>
                             )}
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-                            <h2 className="text-lg font-bold text-white">Aged result</h2>
+                            <h2 className="text-lg font-black text-neutral-950">Aged result</h2>
 
                             {resultImage && (
                                 <div className="flex flex-wrap gap-2">
                                     <button
                                         type="button"
                                         onClick={openViewer}
-                                        className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10"
+                                        className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-black"
                                     >
                                         View full screen
                                     </button>
@@ -423,7 +612,7 @@ export default function AgingPreview() {
                                     <a
                                         href={resultImage}
                                         download={`aging-preview-${ageEffect}-years.jpg`}
-                                        className="rounded-xl border border-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-emerald-500/10"
+                                        className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-black"
                                     >
                                         Download image
                                     </a>
@@ -431,10 +620,10 @@ export default function AgingPreview() {
                             )}
                         </div>
 
-                        <div className="flex min-h-96 items-center justify-center rounded-2xl bg-black/40 p-4">
+                        <div className="flex min-h-96 items-center justify-center rounded-lg bg-neutral-100 p-4">
                             {loading ? (
-                                <div className="flex flex-col items-center gap-3 text-sm font-semibold text-white">
-                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                                <div className="flex flex-col items-center gap-3 text-sm font-semibold text-neutral-700">
+                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-black" />
                                     Applying aging preview...
                                 </div>
                             ) : resultImage ? (
@@ -446,15 +635,16 @@ export default function AgingPreview() {
                                     <img
                                         src={resultImage}
                                         alt="Aging preview result"
-                                        className="max-h-[560px] max-w-full rounded-xl object-contain"
+                                        className="max-h-[560px] max-w-full rounded-lg object-contain"
                                     />
                                 </button>
                             ) : (
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-neutral-500">
                                     Your artistic aging preview will appear here.
                                 </p>
                             )}
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

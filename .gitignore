@@ -43,3 +43,10 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+.venv/
+__pycache__/
+*.pyc
+python-face-analysis/**/.venv/
+python-face-analysis/**/__pycache__/

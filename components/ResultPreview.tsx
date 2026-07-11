@@ -101,57 +101,57 @@ export function ResultPreview({
     }
 
     return (
-        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+        <section className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 className="text-xl font-black text-white">Result preview</h2>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <h2 className="text-xl font-black text-neutral-950">Result preview</h2>
+                    <p className="mt-1 text-sm text-neutral-600">
                         Your generated caricature will appear here.
                     </p>
                 </div>
 
                 {demoMode && (
-                    <span className="w-fit rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-200">
+                    <span className="w-fit rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-bold text-neutral-700">
             Demo mode
           </span>
                 )}
 
                 {!demoMode && hasResult && !isPaid && (
-                    <span className="w-fit rounded-full border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 text-xs font-bold text-yellow-200">
+                    <span className="w-fit rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-bold text-neutral-700">
             Locked preview
           </span>
                 )}
 
                 {hasResult && isPaid && (
-                    <span className="w-fit rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200">
+                    <span className="w-fit rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-bold text-neutral-700">
             Unlocked
           </span>
                 )}
             </div>
 
             {!canZoom && hasResult && (
-                <div className="mb-5 rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
+                <div className="mb-5 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
                     Full screen zoom is available for Pro users or unlocked images.
                 </div>
             )}
 
             <div className="grid gap-4 xl:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-4">
                     <div className="mb-3 flex items-center justify-between gap-3">
-                        <p className="text-sm font-bold text-slate-300">Original photo</p>
+                        <p className="text-sm font-bold text-neutral-700">Original photo</p>
 
                         {originalImage && canZoom && (
                             <button
                                 type="button"
                                 onClick={() => openZoom(originalImage, "Original photo")}
-                                className="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold text-white hover:bg-white/10"
+                                className="rounded-lg border border-neutral-300 bg-white px-3 py-1 text-xs font-bold text-neutral-950 hover:border-black"
                             >
                                 Full screen
                             </button>
                         )}
                     </div>
 
-                    <div className="flex min-h-[360px] items-center justify-center rounded-xl bg-black/40">
+                    <div className="flex min-h-[360px] items-center justify-center rounded-lg bg-white">
                         {originalImage ? (
                             <button
                                 type="button"
@@ -162,42 +162,42 @@ export function ResultPreview({
                                 <img
                                     src={originalImage}
                                     alt="Original"
-                                    className="max-h-[520px] rounded-xl object-contain"
+                                className="max-h-[520px] rounded-lg object-contain"
                                 />
                             </button>
                         ) : (
-                            <p className="px-6 text-center text-sm text-slate-500">
+                            <p className="px-6 text-center text-sm text-neutral-500">
                                 Upload or take a photo first.
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-4">
                     <div className="mb-3 flex items-center justify-between gap-3">
-                        <p className="text-sm font-bold text-slate-300">Caricature</p>
+                        <p className="text-sm font-bold text-neutral-700">Caricature</p>
 
                         {previewImage && canZoom && (
                             <button
                                 type="button"
                                 onClick={() => openZoom(previewImage, "Generated caricature")}
-                                className="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold text-white hover:bg-white/10"
+                                className="rounded-lg border border-neutral-300 bg-white px-3 py-1 text-xs font-bold text-neutral-950 hover:border-black"
                             >
                                 Full screen
                             </button>
                         )}
                     </div>
 
-                    <div className="relative flex min-h-[360px] items-center justify-center rounded-xl bg-black/40">
+                    <div className="relative flex min-h-[360px] items-center justify-center rounded-lg bg-white">
                         {loading && (
                             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-black/70 px-6 text-center">
-                                <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-violet-400" />
+                                <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
 
                                 <p className="text-sm font-bold text-white">
                                     {progressMessage || "Generating caricature..."}
                                 </p>
 
-                                <p className="mt-2 max-w-sm text-xs text-slate-400">
+                                <p className="mt-2 max-w-sm text-xs text-neutral-300">
                                     The AI is creating a new hand-drawn image. This can take a
                                     little while.
                                 </p>
@@ -214,11 +214,11 @@ export function ResultPreview({
                                 <img
                                     src={previewImage}
                                     alt="Generated caricature"
-                                    className="max-h-[520px] rounded-xl object-contain"
+                                className="max-h-[520px] rounded-lg object-contain"
                                 />
                             </button>
                         ) : (
-                            <p className="px-6 text-center text-sm text-slate-500">
+                            <p className="px-6 text-center text-sm text-neutral-500">
                                 No result yet. Generate your first caricature.
                             </p>
                         )}
@@ -226,15 +226,15 @@ export function ResultPreview({
                 </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                <h3 className="font-black text-white">Actions</h3>
+            <div className="mt-5 rounded-xl border border-neutral-300 bg-neutral-50 p-4">
+                <h3 className="font-black text-neutral-950">Actions</h3>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                     <button
                         type="button"
                         onClick={onUnlock}
                         disabled={!hasResult || loading || isPaid}
-                        className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-lg bg-black px-4 py-3 text-sm font-bold text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {isPaid ? "Already unlocked" : "Unlock final image"}
                     </button>
@@ -243,14 +243,14 @@ export function ResultPreview({
                         type="button"
                         onClick={onRegenerate}
                         disabled={!hasResult || loading}
-                        className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-sm font-bold text-neutral-950 hover:border-black disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Generate variation
                     </button>
 
                     <a
                         href={generationId ? `/api/download/${generationId}` : "#"}
-                        className={`rounded-xl border border-white/10 px-4 py-3 text-center text-sm font-bold text-white hover:bg-white/10 ${
+                        className={`rounded-lg border border-neutral-300 bg-white px-4 py-3 text-center text-sm font-bold text-neutral-950 hover:border-black ${
                             !generationId || !isPaid || loading
                                 ? "pointer-events-none opacity-50"
                                 : ""
@@ -261,10 +261,10 @@ export function ResultPreview({
                 </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                <h3 className="font-black text-white">Feedback</h3>
+            <div className="mt-5 rounded-xl border border-neutral-300 bg-neutral-50 p-4">
+                <h3 className="font-black text-neutral-950">Feedback</h3>
 
-                <p className="mt-1 text-sm text-slate-400">
+                <p className="mt-1 text-sm text-neutral-600">
                     Help us improve the caricature style.
                 </p>
 
@@ -275,8 +275,8 @@ export function ResultPreview({
                         disabled={!hasResult || loading}
                         className={`rounded-xl px-4 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                             feedbackRating === "good"
-                                ? "bg-emerald-600 text-white"
-                                : "border border-white/10 text-white hover:bg-white/10"
+                                ? "bg-black text-white"
+                                : "border border-neutral-300 bg-white text-neutral-950 hover:border-black"
                         }`}
                     >
                         Looks good
@@ -288,8 +288,8 @@ export function ResultPreview({
                         disabled={!hasResult || loading}
                         className={`rounded-xl px-4 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                             feedbackRating === "needs_improvement"
-                                ? "bg-yellow-600 text-white"
-                                : "border border-white/10 text-white hover:bg-white/10"
+                                ? "bg-black text-white"
+                                : "border border-neutral-300 bg-white text-neutral-950 hover:border-black"
                         }`}
                     >
                         Needs improvement
@@ -297,7 +297,7 @@ export function ResultPreview({
                 </div>
 
                 {feedbackRating && (
-                    <p className="mt-3 text-sm font-semibold text-emerald-300">
+                    <p className="mt-3 text-sm font-semibold text-neutral-700">
                         Feedback saved.
                     </p>
                 )}
@@ -305,12 +305,12 @@ export function ResultPreview({
 
             {zoomImage && (
                 <div className="fixed inset-0 z-[100] bg-black/95">
-                    <div className="absolute left-0 right-0 top-0 z-20 flex flex-col gap-3 border-b border-white/10 bg-slate-950/90 p-4 backdrop-blur md:flex-row md:items-center md:justify-between">
+                    <div className="absolute left-0 right-0 top-0 z-20 flex flex-col gap-3 border-b border-white/10 bg-neutral-950/90 p-4 backdrop-blur md:flex-row md:items-center md:justify-between">
                         <div>
                             <h3 className="text-lg font-black text-white">
                                 {zoomImage.label}
                             </h3>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-neutral-400">
                                 Zoom, inspect details, and drag the image when zoomed in.
                             </p>
                         </div>
@@ -370,7 +370,7 @@ export function ResultPreview({
                         />
                     </div>
 
-                    <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/10 bg-slate-950/90 px-4 py-2 text-sm font-bold text-white">
+                    <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/10 bg-neutral-950/90 px-4 py-2 text-sm font-bold text-white">
                         Zoom: {Math.round(zoomLevel * 100)}%
                     </div>
                 </div>

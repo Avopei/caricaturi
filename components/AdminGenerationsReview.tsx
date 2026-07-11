@@ -106,11 +106,11 @@ export function AdminGenerationsReview() {
     }
 
     return (
-        <section className="mx-auto mt-8 max-w-7xl rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+        <section className="mx-auto mt-8 max-w-7xl rounded-xl border border-neutral-300 bg-white p-6">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
                     <h2 className="text-xl font-black">Generation review</h2>
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-sm text-neutral-500">
                         Select the best outputs for future LoRA dataset preparation.
                     </p>
                 </div>
@@ -118,31 +118,31 @@ export function AdminGenerationsReview() {
                 <button
                     type="button"
                     onClick={loadGenerations}
-                    className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+                    className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-950 hover:bg-neutral-100"
                 >
                     Refresh
                 </button>
             </div>
 
             {errorMessage && (
-                <div className="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                <div className="mt-5 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {errorMessage}
                 </div>
             )}
 
             {loading ? (
-                <p className="mt-6 text-sm text-slate-400">Loading generations...</p>
+                <p className="mt-6 text-sm text-neutral-500">Loading generations...</p>
             ) : generations.length === 0 ? (
-                <p className="mt-6 text-sm text-slate-400">No generations found.</p>
+                <p className="mt-6 text-sm text-neutral-500">No generations found.</p>
             ) : (
                 <div className="mt-6 grid gap-5 lg:grid-cols-2">
                     {generations.map((generation) => (
                         <article
                             key={generation.id}
-                            className="rounded-3xl border border-white/10 bg-slate-950 p-4"
+                            className="rounded-xl border border-neutral-300 bg-neutral-50 p-4"
                         >
                             <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-                                <div className="aspect-square overflow-hidden rounded-2xl bg-white">
+                                <div className="aspect-square overflow-hidden rounded-lg bg-white">
                                     {generation.previewImage ? (
                                         <img
                                             src={generation.previewImage}
@@ -150,7 +150,7 @@ export function AdminGenerationsReview() {
                                             className="h-full w-full object-cover"
                                         />
                                     ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-sm text-slate-500">
+                                        <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">
                                             No preview
                                         </div>
                                     )}
@@ -158,40 +158,40 @@ export function AdminGenerationsReview() {
 
                                 <div>
                                     <div className="flex flex-wrap gap-2">
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-200">
+                    <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
                       {generation.style}
                     </span>
 
-                                        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-200">
+                                        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
                       {generation.intensity}
                     </span>
 
-                                        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-slate-200">
+                                        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
                       {generation.paymentStatus}
                     </span>
 
                                         {generation.feedbackRating && (
-                                            <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-200">
+                                            <span className="rounded-full border border-neutral-300 bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
                         {generation.feedbackRating}
                       </span>
                                         )}
                                     </div>
 
-                                    <p className="mt-3 text-xs text-slate-500">
+                                    <p className="mt-3 text-xs text-neutral-500">
                                         User: {generation.userId}
                                     </p>
 
-                                    <p className="mt-1 text-xs text-slate-500">
+                                    <p className="mt-1 text-xs text-neutral-500">
                                         Downloads: {generation.downloadCount}
                                     </p>
 
-                                    <p className="mt-1 text-xs text-slate-500">
+                                    <p className="mt-1 text-xs text-neutral-500">
                                         Created:{" "}
                                         {new Date(generation.createdAt).toLocaleString("en-US")}
                                     </p>
 
                                     <div className="mt-4 grid gap-3">
-                                        <label className="flex items-center gap-3 text-sm font-bold text-white">
+                                        <label className="flex items-center gap-3 text-sm font-bold text-neutral-950">
                                             <input
                                                 type="checkbox"
                                                 checked={generation.selectedForTraining}
@@ -205,7 +205,7 @@ export function AdminGenerationsReview() {
                                         </label>
 
                                         <div>
-                                            <label className="mb-2 block text-sm font-bold text-slate-300">
+                                            <label className="mb-2 block text-sm font-bold text-neutral-700">
                                                 Admin quality rating
                                             </label>
 
@@ -218,7 +218,7 @@ export function AdminGenerationsReview() {
                                                             : null
                                                     })
                                                 }
-                                                className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-violet-500"
+                                                className="w-full rounded-xl border border-neutral-300 bg-neutral-100 px-3 py-2 text-neutral-950 outline-none focus:border-black"
                                             >
                                                 <option value="">No rating</option>
                                                 <option value="1">1 — Bad</option>
@@ -230,7 +230,7 @@ export function AdminGenerationsReview() {
                                         </div>
 
                                         <div>
-                                            <label className="mb-2 block text-sm font-bold text-slate-300">
+                                            <label className="mb-2 block text-sm font-bold text-neutral-700">
                                                 Admin notes
                                             </label>
 
@@ -242,7 +242,7 @@ export function AdminGenerationsReview() {
                                                     })
                                                 }
                                                 rows={3}
-                                                className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-violet-500"
+                                                className="w-full rounded-xl border border-neutral-300 bg-neutral-100 px-3 py-2 text-neutral-950 outline-none focus:border-black"
                                                 placeholder="Identity preservation, line quality, prompt issues..."
                                             />
                                         </div>
@@ -251,7 +251,7 @@ export function AdminGenerationsReview() {
                                             type="button"
                                             onClick={() => saveReview(generation)}
                                             disabled={savingId === generation.id}
-                                            className="rounded-xl bg-violet-600 px-4 py-3 text-sm font-black text-white hover:bg-violet-700 disabled:opacity-50"
+                                            className="rounded-xl bg-black px-4 py-3 text-sm font-black text-neutral-950 hover:bg-neutral-800 disabled:opacity-50"
                                         >
                                             {savingId === generation.id ? "Saving..." : "Save review"}
                                         </button>

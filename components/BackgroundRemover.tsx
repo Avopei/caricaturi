@@ -83,10 +83,13 @@ export default function BackgroundRemover() {
     }
 
     return (
-        <div className="min-h-[calc(100vh-7rem)] rounded-[2rem] bg-slate-950 p-4 text-white sm:p-6 lg:p-8">
+        <div className="min-h-[calc(100vh-7rem)] rounded-xl border border-neutral-300 bg-neutral-50 p-4 text-neutral-950 shadow-sm sm:p-6 lg:p-8">
             <div className="mb-6">
-                <h1 className="text-3xl font-black text-white">Background Remover</h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-neutral-500">
+                    Studio workspace
+                </p>
+                <h1 className="mt-2 text-4xl font-black text-neutral-950 md:text-5xl">Background Remover</h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600">
                     Remove the background while keeping the subject unchanged.
                 </p>
             </div>
@@ -99,50 +102,50 @@ export default function BackgroundRemover() {
                         type="button"
                         onClick={removeBackground}
                         disabled={loading}
-                        className="w-full rounded-xl bg-violet-600 px-5 py-3 text-center font-bold text-white hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="w-full rounded-lg bg-black px-5 py-3 text-center font-bold text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {loading ? "Removing background..." : "Remove background"}
                     </button>
 
                     {errorMessage && (
-                        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {errorMessage}
                         </div>
                     )}
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex items-center justify-between gap-3">
-                            <h2 className="text-lg font-bold text-white">Original</h2>
+                            <h2 className="text-lg font-black text-neutral-950">Original</h2>
                             {file && (
-                                <span className="truncate text-xs text-slate-500">
+                                <span className="truncate text-xs text-neutral-500">
                                     {file.name}
                                 </span>
                             )}
                         </div>
 
-                        <div className="flex min-h-96 items-center justify-center rounded-2xl bg-black/40 p-4">
+                        <div className="flex min-h-96 items-center justify-center rounded-lg bg-neutral-100 p-4">
                             {preview ? (
                                 <img
                                     src={preview}
                                     alt="Original uploaded preview"
-                                    className="max-h-[560px] max-w-full rounded-xl object-contain"
+                                    className="max-h-[560px] max-w-full rounded-lg object-contain"
                                 />
                             ) : (
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-neutral-500">
                                     Upload an image to preview it here.
                                 </p>
                             )}
                         </div>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">
                         <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                             <div>
-                                <h2 className="text-lg font-bold text-white">Result</h2>
+                                <h2 className="text-lg font-black text-neutral-950">Result</h2>
                                 {resultPath && (
-                                    <p className="mt-1 text-xs text-slate-500">Saved</p>
+                                    <p className="mt-1 text-xs text-neutral-500">Saved</p>
                                 )}
                             </div>
 
@@ -151,7 +154,7 @@ export default function BackgroundRemover() {
                                     <button
                                         type="button"
                                         onClick={openViewer}
-                                        className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10"
+                                        className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-black"
                                     >
                                         View full screen
                                     </button>
@@ -159,7 +162,7 @@ export default function BackgroundRemover() {
                                     <a
                                         href={resultImage}
                                         download="background-removed.png"
-                                        className="rounded-xl border border-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-emerald-500/10"
+                                        className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-black"
                                     >
                                         Download PNG
                                     </a>
@@ -167,10 +170,10 @@ export default function BackgroundRemover() {
                             )}
                         </div>
 
-                        <div className="flex min-h-96 items-center justify-center rounded-2xl bg-[linear-gradient(45deg,#1e293b_25%,transparent_25%,transparent_75%,#1e293b_75%),linear-gradient(45deg,#1e293b_25%,transparent_25%,transparent_75%,#1e293b_75%)] bg-[length:24px_24px] bg-[position:0_0,12px_12px] p-4">
+                        <div className="flex min-h-96 items-center justify-center rounded-lg bg-[linear-gradient(45deg,#e5e5e5_25%,transparent_25%,transparent_75%,#e5e5e5_75%),linear-gradient(45deg,#e5e5e5_25%,transparent_25%,transparent_75%,#e5e5e5_75%)] bg-[length:24px_24px] bg-[position:0_0,12px_12px] p-4">
                             {loading ? (
-                                <div className="flex flex-col items-center gap-3 text-sm font-semibold text-white">
-                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                                <div className="flex flex-col items-center gap-3 text-sm font-semibold text-neutral-700">
+                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-black" />
                                     Removing background...
                                 </div>
                             ) : resultImage ? (
@@ -182,11 +185,11 @@ export default function BackgroundRemover() {
                                     <img
                                         src={resultImage}
                                         alt="Background removed result"
-                                        className="max-h-[560px] max-w-full rounded-xl object-contain"
+                                        className="max-h-[560px] max-w-full rounded-lg object-contain"
                                     />
                                 </button>
                             ) : (
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-neutral-500">
                                     Your cleaned image will appear here.
                                 </p>
                             )}

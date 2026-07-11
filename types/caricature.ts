@@ -8,6 +8,19 @@ export type CaricatureStyle =
 
 export type CaricatureIntensity = "low" | "medium" | "high";
 
+export type StyleOption = {
+    value: CaricatureStyle;
+    label: string;
+    description: string;
+    pro?: boolean;
+};
+
+export type IntensityOption = {
+    value: CaricatureIntensity;
+    label: string;
+    description: string;
+};
+
 export type GenerationPaymentStatus = "unpaid" | "paid";
 
 export type FeedbackRating = "good" | "needs_improvement";
@@ -24,10 +37,10 @@ export type ModelProvider = "openai" | "custom_lora_ready";
 
 export type FaceControls = {
     eyes: "normal" | "slightly_larger" | "more_expressive";
-    nose: "normal" | "slightly_larger" | "more_defined";
-    jawline: "normal" | "slightly_stronger" | "softer";
-    expression: "preserve" | "slightly_happier" | "more_serious";
-    headSize: "normal" | "slightly_larger" | "larger";
+    nose: "normal" | "slightly_emphasized" | "more_emphasized";
+    jawline: "normal" | "slightly_sharper" | "more_defined";
+    expression: "preserve" | "slightly_more_confident";
+    headSize: "normal" | "slightly_larger";
 };
 
 export type GenerateResponse = {
@@ -73,11 +86,11 @@ export type LocalGeneration = {
 export type ProfilePlanInfo = {
     plan: UserPlan;
     freeGenerationsUsed: number;
-    freeGenerationsLimit: number;
+    freeGenerationLimit: number;
     remainingFreeGenerations: number;
 };
 
-export type ToolStatus = "available" | "coming_soon" | "pro";
+export type ToolStatus = "active" | "soon" | "available" | "coming_soon" | "pro";
 
 export type StudioTool = {
     title: string;

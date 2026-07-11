@@ -533,42 +533,42 @@ export function CaricatureGenerator() {
     }
 
     return (
-        <section className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl shadow-slate-300/60">
+        <section className="rounded-xl border border-neutral-300 bg-neutral-50 p-4 text-neutral-950 shadow-sm sm:p-6">
             <div className="mx-auto max-w-7xl">
                 <div className="mb-8 grid gap-6 xl:grid-cols-[1fr_380px]">
-                    <header className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                        <div className="mb-4 inline-flex rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm font-bold text-violet-200">
+                    <header className="rounded-xl border border-neutral-300 bg-white p-6 shadow-sm md:p-8">
+                        <div className="mb-4 inline-flex rounded-full border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-600">
                             Caricature Studio
                         </div>
 
-                        <h1 className="max-w-4xl text-4xl font-black tracking-tight md:text-5xl">
+                        <h1 className="max-w-4xl text-4xl font-black tracking-tight text-neutral-950 md:text-6xl">
                             Create a hand-drawn caricature
                         </h1>
 
-                        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-400 md:text-lg">
+                        <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-600 md:text-lg">
                             Upload or take a portrait photo, choose a style, and generate a preview.
                         </p>
 
                         <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                            <div className="rounded-lg border border-neutral-300 bg-neutral-50 p-4">
+                                <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">
                                     Style
                                 </p>
-                                <p className="mt-2 font-black text-white">Hand-drawn</p>
+                                <p className="mt-2 font-black text-neutral-950">Hand-drawn</p>
                             </div>
 
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                            <div className="rounded-lg border border-neutral-300 bg-neutral-50 p-4">
+                                <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">
                                     Output
                                 </p>
-                                <p className="mt-2 font-black text-white">Preview + final</p>
+                                <p className="mt-2 font-black text-neutral-950">Preview + final</p>
                             </div>
 
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                            <div className="rounded-lg border border-neutral-300 bg-neutral-50 p-4">
+                                <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">
                                     Pro
                                 </p>
-                                <p className="mt-2 font-black text-white">Style controls</p>
+                                <p className="mt-2 font-black text-neutral-950">Style controls</p>
                             </div>
                         </div>
                     </header>
@@ -577,28 +577,28 @@ export function CaricatureGenerator() {
                 </div>
 
                 <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-slate-400">Total</p>
-                        <p className="mt-2 text-3xl font-black text-white">{stats.total}</p>
+                    <div className="rounded-lg border border-neutral-300 bg-white p-5">
+                        <p className="text-sm text-neutral-500">Total</p>
+                        <p className="mt-2 text-3xl font-black text-neutral-950">{stats.total}</p>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-slate-400">Locked</p>
-                        <p className="mt-2 text-3xl font-black text-yellow-200">
+                    <div className="rounded-lg border border-neutral-300 bg-white p-5">
+                        <p className="text-sm text-neutral-500">Locked</p>
+                        <p className="mt-2 text-3xl font-black text-neutral-950">
                             {stats.unpaid}
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-slate-400">Unlocked</p>
-                        <p className="mt-2 text-3xl font-black text-emerald-300">
+                    <div className="rounded-lg border border-neutral-300 bg-white p-5">
+                        <p className="text-sm text-neutral-500">Unlocked</p>
+                        <p className="mt-2 text-3xl font-black text-neutral-950">
                             {stats.paid}
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-slate-400">Demo</p>
-                        <p className="mt-2 text-3xl font-black text-violet-300">
+                    <div className="rounded-lg border border-neutral-300 bg-white p-5">
+                        <p className="text-sm text-neutral-500">Demo</p>
+                        <p className="mt-2 text-3xl font-black text-neutral-950">
                             {stats.demo}
                         </p>
                     </div>
@@ -609,7 +609,7 @@ export function CaricatureGenerator() {
                         <ImageUploader preview={preview} onFileChange={handleFileChange} />
 
                         {errorMessage && (
-                            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                            <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                                 {errorMessage}
                             </div>
                         )}
@@ -618,7 +618,7 @@ export function CaricatureGenerator() {
                             type="button"
                             onClick={generateCaricature}
                             disabled={loading || !file}
-                            className="w-full rounded-2xl bg-violet-600 px-5 py-4 text-base font-bold text-white shadow-lg shadow-violet-950/40 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="w-full rounded-lg bg-black px-5 py-4 text-base font-bold text-white shadow-sm transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {loading ? progressMessage || "Generating..." : "Generate caricature"}
                         </button>
@@ -659,7 +659,7 @@ export function CaricatureGenerator() {
 
                 <div id="history">
                     {historyLoading ? (
-                        <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center text-slate-400">
+                        <section className="mt-8 rounded-xl border border-neutral-300 bg-white p-8 text-center text-neutral-500">
                             Loading history...
                         </section>
                     ) : (
