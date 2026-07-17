@@ -6,7 +6,7 @@ const tools = [
         description:
             "Create a hand-drawn caricature from a portrait with preview, feedback, and download flow.",
         href: "/dashboard/caricature",
-        icon: "CS",
+        icon: "caricature" as const,
         status: "active" as const
     },
     {
@@ -14,7 +14,7 @@ const tools = [
         description:
             "Generate realistic age progression portraits while preserving identity and composition.",
         href: "/dashboard/aging",
-        icon: "AI",
+        icon: "aging" as const,
         status: "active" as const
     },
     {
@@ -22,7 +22,7 @@ const tools = [
         description:
             "Review planned style options for future portrait workflows.",
         href: "/dashboard/styles",
-        icon: "SR",
+        icon: "sketch" as const,
         status: "soon" as const
     },
     {
@@ -30,7 +30,7 @@ const tools = [
         description:
             "Remove the background from an uploaded image while keeping the subject unchanged.",
         href: "/dashboard/background",
-        icon: "BR",
+        icon: "background" as const,
         status: "active" as const
     },
     {
@@ -38,7 +38,7 @@ const tools = [
         description:
             "Plan profile-ready avatar variants for social and professional use.",
         href: "/dashboard/avatar",
-        icon: "AS",
+        icon: "avatar" as const,
         status: "soon" as const
     },
     {
@@ -46,7 +46,7 @@ const tools = [
         description:
             "Prepare multi-image workflows for repeatable portrait processing.",
         href: "/dashboard/batch",
-        icon: "BT",
+        icon: "batch" as const,
         status: "pro" as const
     }
 ];
@@ -54,27 +54,27 @@ const tools = [
 export function DashboardHome() {
     return (
         <div>
-            <section className="overflow-hidden rounded-xl border border-neutral-300 bg-white shadow-sm">
+            <section className="overflow-hidden border border-line bg-paper">
                 <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
                     <div className="p-8 md:p-10">
-                        <p className="text-xs font-black uppercase tracking-[0.28em] text-neutral-500">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-mute">
                             Studio control room
                         </p>
-                        <h1 className="mt-4 max-w-4xl text-5xl font-black leading-none tracking-tight text-neutral-950 md:text-7xl">
+                        <h1 className="mt-4 max-w-4xl font-display text-5xl leading-[1.02] tracking-[-0.015em] md:text-7xl">
                             Choose a portrait workflow.
                         </h1>
-                        <p className="mt-6 max-w-3xl text-lg leading-8 text-neutral-600">
+                        <p className="mt-6 max-w-3xl text-lg leading-8 text-ink-soft">
                             Upload a photo, generate a result, and review saved history
                             from one calm black-and-white workspace.
                         </p>
                     </div>
-                    <div className="min-h-80 border-t border-neutral-200 bg-neutral-100 p-5 lg:border-l lg:border-t-0">
-                        <div className="flex h-full items-end rounded-lg border border-neutral-300 bg-white p-6">
+                    <div className="min-h-80 border-t border-line bg-surface p-5 lg:border-l lg:border-t-0">
+                        <div className="flex h-full items-end border border-line bg-paper p-6">
                             <div>
-                                <p className="font-mono text-sm text-neutral-500">
-                                    PORTRAIT INDEX
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">
+                                    Portrait index
                                 </p>
-                                <p className="mt-3 text-3xl font-black text-neutral-950">
+                                <p className="mt-3 font-display text-3xl tracking-[-0.01em]">
                                     Tools, previews, downloads.
                                 </p>
                             </div>

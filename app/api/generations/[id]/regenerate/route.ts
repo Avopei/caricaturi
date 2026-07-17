@@ -10,15 +10,16 @@ import {
     uploadFileToStorage
 } from "@/lib/storage";
 import { createWatermarkedPreview } from "@/lib/watermark";
-import type {
-    CaricatureIntensity,
-    CaricatureStyle,
-    UserPlan
-} from "@/types/caricature";
+import type { CaricatureIntensity, CaricatureStyle } from "@/types/caricature";
+import {
+    GenerationNotAllowedError,
+    assertCanGenerate,
+    getOrCreateProfile,
+    incrementUsageIfMetered,
+    remainingGenerations
+} from "@/lib/plan";
 
 export const runtime = "nodejs";
-
-const FREE_GENERATION_LIMIT = 1;
 
 type RouteContext = {
     params: Promise<{
@@ -41,10 +42,6 @@ function isValidIntensity(value: string): value is CaricatureIntensity {
     return ["low", "medium", "high"].includes(value);
 }
 
-function isValidPlan(value: unknown): value is UserPlan {
-    return value === "free" || value === "pro" || value === "admin";
-}
-
 function bufferToDataUrl(buffer: Buffer, mimeType: string) {
     return `data:${mimeType};base64,${buffer.toString("base64")}`;
 }
@@ -65,26 +62,6 @@ function dataUrlToBuffer(dataUrl: string) {
     };
 }
 
-async function getProfile(userId: string) {
-    const { data, error } = await supabaseAdmin
-        .from("profiles")
-        .select("id, plan, free_generations_used")
-        .eq("id", userId)
-        .single();
-
-    if (error || !data) {
-        throw new Error("User profile was not found.");
-    }
-
-    const plan: UserPlan = isValidPlan(data.plan) ? data.plan : "free";
-
-    return {
-        id: data.id as string,
-        plan,
-        freeGenerationsUsed: Number(data.free_generations_used || 0)
-    };
-}
-
 export async function POST(request: Request, context: RouteContext) {
     try {
         const { id } = await context.params;
@@ -102,17 +79,17 @@ export async function POST(request: Request, context: RouteContext) {
             );
         }
 
-        const profile = await getProfile(user.id);
-        const isPro = profile.plan === "pro" || profile.plan === "admin";
+        const profile = await getOrCreateProfile(user.id, user.email);
+        const isPro = profile.plan !== "free" || profile.role === "admin";
 
-        if (!isPro && profile.freeGenerationsUsed >= FREE_GENERATION_LIMIT) {
-            return NextResponse.json(
-                {
-                    error:
-                        "You have used your free generation. Upgrade to Pro for more variations."
-                },
-                { status: 403 }
-            );
+        try {
+            await assertCanGenerate(profile);
+        } catch (error) {
+            if (error instanceof GenerationNotAllowedError) {
+                return NextResponse.json({ error: error.message }, { status: error.status });
+            }
+
+            throw error;
         }
 
         const body = await request.json().catch(() => ({}));
@@ -166,7 +143,7 @@ export async function POST(request: Request, context: RouteContext) {
             style,
             intensity,
             variationToken,
-            plan: profile.plan
+            isPro
         });
 
         const quality = isPro ? "hd" : "standard";
@@ -267,6 +244,7 @@ export async function POST(request: Request, context: RouteContext) {
             .insert({
                 id: generationId,
                 user_id: user.id,
+                tool: "caricature",
                 original_image_path: uploadedOriginalPath,
                 preview_image_path: uploadedPreviewPath,
                 final_image_path: finalPath,
@@ -298,21 +276,15 @@ export async function POST(request: Request, context: RouteContext) {
             throw new Error(insertError.message);
         }
 
-        if (!isPro) {
-            const { error: profileUpdateError } = await supabaseAdmin
-                .from("profiles")
-                .update({
-                    free_generations_used: profile.freeGenerationsUsed + 1
-                })
-                .eq("id", user.id);
-
-            if (profileUpdateError) {
-                throw new Error(profileUpdateError.message);
-            }
-        }
+        await incrementUsageIfMetered(profile);
 
         const previewImage = await createSignedUrl(uploadedPreviewPath);
         const originalImage = await createSignedUrl(uploadedOriginalPath);
+
+        const usedAfterThisRequest =
+            profile.plan === "free" && profile.role !== "admin"
+                ? profile.free_generations_used + 1
+                : profile.free_generations_used;
 
         return NextResponse.json({
             generationId: generation.id,
@@ -320,12 +292,10 @@ export async function POST(request: Request, context: RouteContext) {
             previewImage,
             demo: generation.demo,
             paymentStatus: generation.payment_status,
-            remainingFreeGenerations: isPro
-                ? 999
-                : Math.max(
-                    0,
-                    FREE_GENERATION_LIMIT - (profile.freeGenerationsUsed + 1)
-                )
+            remainingFreeGenerations: await remainingGenerations({
+                ...profile,
+                free_generations_used: usedAfterThisRequest
+            })
         });
     } catch (error) {
         console.error("REGENERATE_ERROR:", error);

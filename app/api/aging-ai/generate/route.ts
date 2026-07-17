@@ -2,8 +2,18 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { generateAgingImage } from "@/lib/aging-ai/provider";
 import { agingPresets, type AgingPreset } from "@/lib/aging-ai/types";
+import { createClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+    GenerationNotAllowedError,
+    assertCanGenerate,
+    getOrCreateProfile,
+    incrementUsageIfMetered
+} from "@/lib/plan";
 
 export const runtime = "nodejs";
+
+const supabaseAdmin = createSupabaseAdminClient();
 
 const allowedPresets = agingPresets.map((preset) => preset.id);
 
@@ -21,6 +31,35 @@ function parseAgePreset(value: FormDataEntryValue | null): AgingPreset | null {
 
 export async function POST(request: Request) {
     try {
+        const supabase = await createClient();
+
+        const {
+            data: { user },
+            error: userError
+        } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+            return NextResponse.json(
+                { ok: false, error: "You must be signed in." },
+                { status: 401 }
+            );
+        }
+
+        const profile = await getOrCreateProfile(user.id, user.email);
+
+        try {
+            await assertCanGenerate(profile);
+        } catch (error) {
+            if (error instanceof GenerationNotAllowedError) {
+                return NextResponse.json(
+                    { ok: false, error: error.message },
+                    { status: error.status }
+                );
+            }
+
+            throw error;
+        }
+
         const formData = await request.formData();
         const image = formData.get("image");
         const agePreset = parseAgePreset(formData.get("agePreset"));
@@ -51,6 +90,23 @@ export async function POST(request: Request) {
             agePreset,
             variationToken: randomUUID()
         });
+
+        const { error: insertError } = await supabaseAdmin.from("generations").insert({
+            id: randomUUID(),
+            user_id: user.id,
+            tool: "aging",
+            preset: agePreset,
+            storage_path: imageUrl,
+            prompt_used: prompt,
+            status: "completed",
+            model_provider: provider
+        });
+
+        if (insertError) {
+            console.error("AGING_GENERATIONS_INSERT_ERROR", insertError.message);
+        }
+
+        await incrementUsageIfMetered(profile);
 
         return NextResponse.json({
             ok: true,

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
-import type { UserPlan } from "@/types/caricature";
 
 export const runtime = "nodejs";
 
@@ -11,10 +10,6 @@ type RouteContext = {
     }>;
 };
 
-function isValidPlan(value: unknown): value is UserPlan {
-    return value === "free" || value === "pro" || value === "studio";
-}
-
 export async function PATCH(request: Request, context: RouteContext) {
     try {
         await requireAdminApiUser();
@@ -22,11 +17,11 @@ export async function PATCH(request: Request, context: RouteContext) {
         const { id } = await context.params;
         const body = await request.json();
 
-        const plan = body.plan;
+        const limit = body.limit;
 
-        if (!isValidPlan(plan)) {
+        if (limit !== null && (typeof limit !== "number" || limit < 0 || !Number.isInteger(limit))) {
             return NextResponse.json(
-                { error: "Invalid plan value." },
+                { error: "Limit must be a non-negative integer, or null to reset to the plan default." },
                 { status: 400 }
             );
         }
@@ -34,7 +29,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         const { error } = await supabaseAdmin
             .from("profiles")
             .update({
-                plan
+                free_generations_limit: limit
             })
             .eq("id", id);
 
@@ -44,7 +39,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
         return NextResponse.json({
             success: true,
-            plan
+            limit
         });
     } catch (error) {
         const authResponse = adminAuthErrorResponse(error);
@@ -56,7 +51,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json(
             {
                 error:
-                    error instanceof Error ? error.message : "Could not update plan."
+                    error instanceof Error ? error.message : "Could not update limit."
             },
             { status: 500 }
         );

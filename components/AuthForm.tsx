@@ -1,21 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthFormProps = {
     mode: "sign-in" | "sign-up";
 };
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm(props: AuthFormProps) {
+    return (
+        <Suspense fallback={null}>
+            <AuthFormInner {...props} />
+        </Suspense>
+    );
+}
+
+function AuthFormInner({ mode }: AuthFormProps) {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState(
+        searchParams.get("error") || ""
+    );
+    const [checkEmail, setCheckEmail] = useState(false);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -25,16 +37,36 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         const supabase = createClient();
 
-        const result =
-            mode === "sign-up"
-                ? await supabase.auth.signUp({
-                    email,
-                    password
-                })
-                : await supabase.auth.signInWithPassword({
-                    email,
-                    password
-                });
+        if (mode === "sign-up") {
+            const result = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/auth/callback`
+                }
+            });
+
+            setLoading(false);
+
+            if (result.error) {
+                setErrorMessage(result.error.message);
+                return;
+            }
+
+            if (result.data.session) {
+                router.push("/dashboard");
+                router.refresh();
+                return;
+            }
+
+            setCheckEmail(true);
+            return;
+        }
+
+        const result = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
         setLoading(false);
 
@@ -45,6 +77,21 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         router.push("/dashboard");
         router.refresh();
+    }
+
+    if (checkEmail) {
+        return (
+            <div className="mx-auto w-full max-w-md rounded-xl border border-neutral-300 bg-white p-6 text-neutral-950 shadow-sm">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-neutral-500">
+                    PortraitLab Studio
+                </p>
+                <h1 className="mt-3 text-3xl font-black">Check your email</h1>
+                <p className="mt-4 text-sm leading-6 text-neutral-600">
+                    We sent a confirmation link to <strong>{email}</strong>. Click it to
+                    finish creating your account and sign in.
+                </p>
+            </div>
+        );
     }
 
     return (

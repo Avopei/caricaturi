@@ -1,57 +1,83 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
 import { createSignedUrl } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
-async function requireAdmin() {
-    const supabase = await createClient();
+const DEFAULT_PAGE_SIZE = 20;
 
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        throw new Error("UNAUTHORIZED");
+async function resolvePreviewUrl(path: string | null) {
+    if (!path) {
+        return null;
     }
 
-    const { data: profile, error } = await supabaseAdmin
-        .from("profiles")
-        .select("plan")
-        .eq("id", user.id)
-        .single();
-
-    if (error || !profile || profile.plan !== "admin") {
-        throw new Error("FORBIDDEN");
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+        return path;
     }
 
-    return user;
+    try {
+        return await createSignedUrl(path);
+    } catch {
+        return null;
+    }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        await requireAdmin();
+        await requireAdminApiUser();
 
-        const { data, error } = await supabaseAdmin
+        const { searchParams } = new URL(request.url);
+        const page = Math.max(1, Number(searchParams.get("page")) || 1);
+        const pageSize = Math.min(
+            100,
+            Math.max(1, Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
+        );
+
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
+
+        const { data, error, count } = await supabaseAdmin
             .from("generations")
             .select(
-                "id, user_id, preview_image_path, style, intensity, payment_status, feedback_rating, download_count, selected_for_training, admin_quality_rating, admin_notes, created_at"
+                "id, user_id, tool, preset, preview_image_path, storage_path, style, intensity, payment_status, feedback_rating, download_count, selected_for_training, admin_quality_rating, admin_notes, created_at",
+                { count: "exact" }
             )
             .order("created_at", { ascending: false })
-            .limit(30);
+            .range(from, to);
 
         if (error) {
             throw new Error(error.message);
         }
 
+        const rows = data || [];
+        const userIds = [...new Set(rows.map((row) => row.user_id).filter(Boolean))];
+
+        const emailByUserId = new Map<string, string | null>();
+
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabaseAdmin
+                .from("profiles")
+                .select("id, email")
+                .in("id", userIds);
+
+            (profiles || []).forEach((profile) => {
+                emailByUserId.set(profile.id, profile.email);
+            });
+        }
+
         const generations = await Promise.all(
-            (data || []).map(async (generation) => ({
+            rows.map(async (generation) => ({
                 id: generation.id,
                 userId: generation.user_id,
-                previewImage: generation.preview_image_path
-                    ? await createSignedUrl(generation.preview_image_path)
+                userEmail: generation.user_id
+                    ? emailByUserId.get(generation.user_id) || null
                     : null,
+                tool: generation.tool,
+                preset: generation.preset,
+                previewImage: await resolvePreviewUrl(
+                    generation.preview_image_path || generation.storage_path
+                ),
                 style: generation.style,
                 intensity: generation.intensity,
                 paymentStatus: generation.payment_status,
@@ -65,21 +91,16 @@ export async function GET() {
         );
 
         return NextResponse.json({
-            generations
+            generations,
+            page,
+            pageSize,
+            total: count || 0
         });
     } catch (error) {
-        if (error instanceof Error && error.message === "UNAUTHORIZED") {
-            return NextResponse.json(
-                { error: "You must be signed in." },
-                { status: 401 }
-            );
-        }
+        const authResponse = adminAuthErrorResponse(error);
 
-        if (error instanceof Error && error.message === "FORBIDDEN") {
-            return NextResponse.json(
-                { error: "Admin access required." },
-                { status: 403 }
-            );
+        if (authResponse) {
+            return authResponse;
         }
 
         return NextResponse.json(

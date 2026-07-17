@@ -1,14 +1,13 @@
 import type {
     CaricatureIntensity,
-    CaricatureStyle,
-    UserPlan
+    CaricatureStyle
 } from "@/types/caricature";
 
 export type PromptInput = {
     style: CaricatureStyle;
     intensity: CaricatureIntensity;
     variationToken: string;
-    plan: UserPlan;
+    isPro: boolean;
 };
 
 const variationInstructions = [
@@ -141,8 +140,8 @@ Off-white paper background.
     }
 }
 
-function getQualityInstruction(plan: UserPlan) {
-    if (plan === "pro" || plan === "admin") {
+function getQualityInstruction(isPro: boolean) {
+    if (isPro) {
         return `
 PRO QUALITY INSTRUCTION:
 Use higher artistic consistency, cleaner hand-drawn structure, refined pencil and ink control, stronger identity preservation, and premium finished portrait quality.
@@ -161,7 +160,7 @@ export function buildCaricaturePrompt({
                                           style,
                                           intensity,
                                           variationToken,
-                                          plan
+                                          isPro
                                       }: PromptInput) {
     const randomVariation =
         variationInstructions[
@@ -219,7 +218,7 @@ This generation must not copy the previous result exactly.
 Create a noticeably different hand-drawn interpretation while preserving identity, pose, clothes, and expression.
 Vary the linework, shading, pencil texture, and subtle facial exaggeration.
 
-${getQualityInstruction(plan)}
+${getQualityInstruction(isPro)}
 
 Uniqueness token:
 ${variationToken}-${randomNumber}

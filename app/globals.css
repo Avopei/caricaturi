@@ -2,16 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ink: #0c0c0c;
+  --ink-soft: #2a2a28;
+  --paper: #ffffff;
+  --surface: #f5f5f3;
+  --line: #e4e4e1;
+  --line-dark: #3a3a38;
+  --mute: #7c7c76;
+  --ease-studio: cubic-bezier(0.22, 0.61, 0.2, 1);
+}
+
 * {
   box-sizing: border-box;
 }
 
 html {
-  background: #f5f5f4;
+  background: var(--paper);
 }
 
 body {
   margin: 0;
-  background: #f5f5f4;
-  color: #171717;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    animation: hero-rise 0.9s var(--ease-studio) both;
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.9s var(--ease-studio),
+      transform 0.9s var(--ease-studio);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise,
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }

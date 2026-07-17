@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { ToolStatus } from "@/types/caricature";
+import { ToolSwatch, type ToolSwatchKind } from "@/components/ui/ToolSwatch";
 
 type ToolCardProps = {
     title: string;
     description: string;
     href: string;
-    icon: string;
+    icon: ToolSwatchKind;
     status: ToolStatus;
 };
 
@@ -17,36 +18,34 @@ export function ToolCard({
                              status
                          }: ToolCardProps) {
     const isActive = status === "active";
-    const badge = isActive ? "Active" : status === "pro" ? "Studio plan" : "Available";
+    const badge = isActive ? "Active" : status === "pro" ? "Studio plan" : "Coming soon";
 
     return (
         <Link
             href={href}
-            className="group flex min-h-full flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white shadow-sm transition hover:-translate-y-1 hover:border-black hover:shadow-xl"
+            className="group flex min-h-full flex-col overflow-hidden border border-line bg-paper text-ink transition duration-300 ease-studio hover:bg-ink hover:text-paper"
         >
-            <div className="aspect-[16/10] border-b border-neutral-200 bg-neutral-100 p-4">
-                <div className="flex h-full items-end justify-between rounded-lg border border-neutral-300 bg-white p-4">
-                    <div>
-                        <p className="font-mono text-xs text-neutral-500">{icon}</p>
-                        <p className="mt-2 max-w-44 text-2xl font-black leading-7 text-neutral-950">
-                            {title}
-                        </p>
-                    </div>
-                    <div className="h-20 w-14 rounded-t-full bg-neutral-950 transition group-hover:h-24" />
-                </div>
+            <div className="flex items-center justify-between border-b border-line p-6 group-hover:border-line-dark">
+                <ToolSwatch kind={icon} />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mute group-hover:text-paper/60">
+                    {badge}
+                </span>
             </div>
 
             <div className="flex flex-1 flex-col p-6">
-                <div className="flex items-center justify-between gap-3">
-                    <span className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-neutral-600">
-                        {badge}
+                <h3 className="font-display text-2xl tracking-[-0.01em]">{title}</h3>
+                <p className="mt-4 flex-1 text-sm leading-6 text-ink-soft group-hover:text-paper/70">
+                    {description}
+                </p>
+
+                <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold">
+                    <span>Open workspace</span>
+                    <span
+                        aria-hidden="true"
+                        className="inline-block transition-transform duration-300 ease-studio group-hover:translate-x-1"
+                    >
+                        →
                     </span>
-                </div>
-
-                <p className="mt-5 flex-1 leading-7 text-neutral-600">{description}</p>
-
-                <div className="mt-6 inline-flex font-black text-black">
-                    Open workspace
                 </div>
             </div>
         </Link>

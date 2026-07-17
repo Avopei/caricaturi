@@ -8,11 +8,17 @@ import {
     uploadFileToStorage
 } from "@/lib/storage";
 import { buildCaricaturePrompt } from "@/lib/ai/prompts";
+import {
+    GenerationNotAllowedError,
+    assertCanGenerate,
+    getOrCreateProfile,
+    incrementUsageIfMetered,
+    remainingGenerations
+} from "@/lib/plan";
 
 import type {
     CaricatureIntensity,
-    CaricatureStyle,
-    UserPlan
+    CaricatureStyle
 } from "@/types/caricature";
 
 export const runtime = "nodejs";
@@ -22,8 +28,6 @@ const supabaseAdmin = createSupabaseAdminClient();
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
-
-const FREE_GENERATIONS_LIMIT = 3;
 
 const allowedStyles: CaricatureStyle[] = [
     "realistic_human_drawn",
@@ -35,48 +39,6 @@ const allowedStyles: CaricatureStyle[] = [
 ];
 
 const allowedIntensities: CaricatureIntensity[] = ["low", "medium", "high"];
-
-type ProfileRow = {
-    id: string;
-    plan: UserPlan;
-    free_generations_used: number;
-};
-
-async function getProfile(userId: string): Promise<ProfileRow> {
-    const { data, error } = await supabaseAdmin
-        .from("profiles")
-        .select("id, plan, free_generations_used")
-        .eq("id", userId)
-        .single();
-
-    if (error || !data) {
-        const { data: createdProfile, error: createError } = await supabaseAdmin
-            .from("profiles")
-            .insert({
-                id: userId,
-                plan: "free",
-                free_generations_used: 0
-            })
-            .select("id, plan, free_generations_used")
-            .single();
-
-        if (createError || !createdProfile) {
-            throw new Error(createError?.message || "Could not create user profile.");
-        }
-
-        return {
-            id: createdProfile.id,
-            plan: createdProfile.plan as UserPlan,
-            free_generations_used: createdProfile.free_generations_used || 0
-        };
-    }
-
-    return {
-        id: data.id,
-        plan: data.plan as UserPlan,
-        free_generations_used: data.free_generations_used || 0
-    };
-}
 
 function validateStyle(value: FormDataEntryValue | null): CaricatureStyle {
     if (typeof value !== "string") {
@@ -160,22 +122,20 @@ export async function POST(request: Request) {
             );
         }
 
-        const profile = await getProfile(user.id);
+        const profile = await getOrCreateProfile(user.id, user.email);
 
-        const isPro = profile.plan === "pro" || profile.plan === "admin";
-        const isAdmin = profile.plan === "admin";
-        const demoMode = process.env.DEMO_MODE === "true";
+        try {
+            await assertCanGenerate(profile);
+        } catch (error) {
+            if (error instanceof GenerationNotAllowedError) {
+                return NextResponse.json({ error: error.message }, { status: error.status });
+            }
 
-        if (!isPro && profile.free_generations_used >= FREE_GENERATIONS_LIMIT) {
-            return NextResponse.json(
-                {
-                    error: "You have used all free generations. Upgrade to continue."
-                },
-                {
-                    status: 403
-                }
-            );
+            throw error;
         }
+
+        const isPro = profile.plan !== "free" || profile.role === "admin";
+        const demoMode = process.env.DEMO_MODE === "true";
 
         const generationId = randomUUID();
         const variationToken = randomUUID();
@@ -201,7 +161,7 @@ export async function POST(request: Request) {
             style,
             intensity,
             variationToken,
-            plan: profile.plan
+            isPro
         });
 
         if (demoMode) {
@@ -249,13 +209,14 @@ export async function POST(request: Request) {
 
         const originalImage = await createSignedUrl(uploadedOriginalPath);
 
-        const paymentStatus = isPro || isAdmin ? "paid" : "unpaid";
+        const paymentStatus = isPro ? "paid" : "unpaid";
 
         const { error: insertError } = await supabaseAdmin
             .from("generations")
             .insert({
                 id: generationId,
                 user_id: user.id,
+                tool: "caricature",
                 original_image_path: uploadedOriginalPath,
                 preview_image_path: previewPath,
                 final_image_path: finalPath,
@@ -278,25 +239,20 @@ export async function POST(request: Request) {
             throw new Error(insertError.message);
         }
 
-        if (!isPro && !isAdmin && !demoMode) {
-            const { error: updateProfileError } = await supabaseAdmin
-                .from("profiles")
-                .update({
-                    free_generations_used: profile.free_generations_used + 1
-                })
-                .eq("id", user.id);
+        let usedAfterThisRequest = profile.free_generations_used;
 
-            if (updateProfileError) {
-                console.error("Could not update free generations:", updateProfileError);
+        if (!demoMode) {
+            await incrementUsageIfMetered(profile);
+
+            if (profile.plan === "free" && profile.role !== "admin") {
+                usedAfterThisRequest += 1;
             }
         }
 
-        const remainingFreeGenerations = isPro
-            ? FREE_GENERATIONS_LIMIT
-            : Math.max(
-                0,
-                FREE_GENERATIONS_LIMIT - (profile.free_generations_used + 1)
-            );
+        const remainingFreeGenerations = await remainingGenerations({
+            ...profile,
+            free_generations_used: usedAfterThisRequest
+        });
 
         return NextResponse.json({
             generationId,

@@ -1,37 +1,13 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
 import { createSignedUrl } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
-async function requireAdmin() {
-    const supabase = await createClient();
-
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        throw new Error("UNAUTHORIZED");
-    }
-
-    const { data: profile, error } = await supabaseAdmin
-        .from("profiles")
-        .select("plan")
-        .eq("id", user.id)
-        .single();
-
-    if (error || !profile || profile.plan !== "admin") {
-        throw new Error("FORBIDDEN");
-    }
-
-    return user;
-}
-
 export async function GET() {
     try {
-        await requireAdmin();
+        await requireAdminApiUser();
 
         const { data, error } = await supabaseAdmin
             .from("generations")
@@ -93,18 +69,10 @@ export async function GET() {
             dataset
         });
     } catch (error) {
-        if (error instanceof Error && error.message === "UNAUTHORIZED") {
-            return NextResponse.json(
-                { error: "You must be signed in." },
-                { status: 401 }
-            );
-        }
+        const authResponse = adminAuthErrorResponse(error);
 
-        if (error instanceof Error && error.message === "FORBIDDEN") {
-            return NextResponse.json(
-                { error: "Admin access required." },
-                { status: 403 }
-            );
+        if (authResponse) {
+            return authResponse;
         }
 
         return NextResponse.json(

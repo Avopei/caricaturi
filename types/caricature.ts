@@ -25,11 +25,15 @@ export type GenerationPaymentStatus = "unpaid" | "paid";
 
 export type FeedbackRating = "good" | "needs_improvement";
 
-export type UserPlan = "free" | "pro" | "admin";
+export type UserPlan = "free" | "pro" | "studio";
 
-export type GenerationQuality = "standard" | "pro";
+export type UserRole = "user" | "admin";
 
-export type WatermarkType = "standard" | "pro" | "none";
+export type GenerationQuality = "standard" | "pro" | "hd";
+
+export type WatermarkType = "standard" | "pro" | "none" | "small";
+
+export type GenerationTool = "caricature" | "aging" | "background";
 
 export type GenerationMode = "demo" | "standard" | "pro_lora";
 

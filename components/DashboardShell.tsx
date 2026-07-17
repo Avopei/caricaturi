@@ -48,22 +48,22 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
     if (isToolWorkspace) {
         return (
-            <main className="min-h-screen bg-stone-100 text-neutral-950">
-                <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/95 backdrop-blur">
+            <main className="min-h-screen bg-surface text-ink">
+                <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">
                     <div className="mx-auto flex max-w-[1800px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/dashboard"
-                                className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-700 shadow-sm hover:border-black hover:bg-neutral-50"
+                                className="border border-line bg-paper px-4 py-2 text-sm font-semibold text-ink-soft transition duration-300 ease-studio hover:border-ink hover:bg-ink hover:text-paper"
                             >
                                 Back to tools
                             </Link>
 
                             <div className="hidden sm:block">
-                                <p className="text-xs font-bold uppercase tracking-[0.25em] text-neutral-500">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-mute">
                                     Workspace
                                 </p>
-                                <h1 className="text-lg font-black text-neutral-950">
+                                <h1 className="font-display text-lg tracking-[-0.01em] text-ink">
                                     {title}
                                 </h1>
                             </div>
@@ -72,7 +72,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/pricing"
-                                className="hidden rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-700 shadow-sm hover:border-black hover:bg-neutral-50 sm:inline-flex"
+                                className="hidden border border-line bg-paper px-4 py-2 text-sm font-semibold text-ink-soft transition duration-300 ease-studio hover:border-ink hover:bg-ink hover:text-paper sm:inline-flex"
                             >
                                 Pricing
                             </Link>
@@ -90,20 +90,20 @@ export function DashboardShell({ children }: DashboardShellProps) {
     }
 
     return (
-        <main className="min-h-screen bg-stone-100 text-neutral-950">
+        <main className="min-h-screen bg-surface text-ink">
             <div className="mx-auto grid min-h-screen max-w-[1800px] gap-6 px-4 py-4 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
-                <aside className="hidden rounded-xl border border-neutral-300 bg-white p-5 shadow-sm lg:block">
+                <aside className="hidden border border-line bg-paper p-5 lg:block">
                     <div className="mb-8">
                         <Link href="/" className="block">
-                            <p className="text-xs font-black uppercase tracking-[0.3em] text-neutral-500">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-mute">
                                 Studio
                             </p>
-                            <h1 className="mt-2 text-2xl font-black text-neutral-950">
+                            <h1 className="mt-2 font-display text-2xl tracking-[-0.01em] text-ink">
                                 PortraitLab Studio
                             </h1>
                         </Link>
 
-                        <p className="mt-3 text-sm leading-6 text-neutral-500">
+                        <p className="mt-3 text-sm leading-6 text-ink-soft">
                             Choose a tool, process a photo, and review saved results.
                         </p>
                     </div>
@@ -118,18 +118,18 @@ export function DashboardShell({ children }: DashboardShellProps) {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`block rounded-lg border px-4 py-3 transition ${
+                                    className={`block border px-4 py-3 transition duration-300 ease-studio ${
                                         isActive
-                                            ? "border-black bg-black text-white"
-                                            : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50"
+                                            ? "border-ink bg-ink text-paper"
+                                            : "border-line bg-paper text-ink-soft hover:border-ink hover:bg-ink hover:text-paper"
                                     }`}
                                 >
-                                    <span className="block text-sm font-black">
+                                    <span className="block text-sm font-semibold">
                                         {item.label}
                                     </span>
                                     <span
                                         className={`mt-1 block text-xs ${
-                                            isActive ? "text-neutral-300" : "text-neutral-500"
+                                            isActive ? "text-paper/60" : "text-mute"
                                         }`}
                                     >
                                         {item.description}
@@ -141,12 +141,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 </aside>
 
                 <section className="min-w-0">
-                    <header className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-sm">
+                    <header className="mb-6 flex items-center justify-between gap-4 border border-line bg-paper p-4">
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-[0.25em] text-neutral-500">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-mute">
                                 Dashboard
                             </p>
-                            <h2 className="mt-1 text-xl font-black text-neutral-950">
+                            <h2 className="mt-1 font-display text-xl tracking-[-0.01em] text-ink">
                                 {title}
                             </h2>
                         </div>
@@ -154,7 +154,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/pricing"
-                                className="hidden rounded-lg border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-black hover:bg-neutral-50 sm:inline-flex"
+                                className="hidden border border-line px-4 py-2 text-sm font-semibold text-ink-soft transition duration-300 ease-studio hover:border-ink hover:bg-ink hover:text-paper sm:inline-flex"
                             >
                                 Pricing
                             </Link>

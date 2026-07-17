@@ -1,52 +1,84 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { HeroCompareSlider } from "@/components/ui/HeroCompareSlider";
+import { Reveal } from "@/components/ui/Reveal";
 import { StudioButton } from "@/components/ui/StudioButton";
 import { StudioImageFrame } from "@/components/ui/StudioImageFrame";
 import { StudioSectionHeader } from "@/components/ui/StudioSectionHeader";
+import { ToolSwatch } from "@/components/ui/ToolSwatch";
+import { Viewfinder } from "@/components/ui/Viewfinder";
 import { createClient } from "@/lib/supabase/server";
 
 const tools = [
     {
-        title: "AI Caricature Generator",
+        title: "Caricature Studio",
         description:
             "Create recognizable, hand-drawn caricature previews with controlled exaggeration.",
         href: "/dashboard/caricature",
-        label: "Line portrait"
+        swatch: "caricature" as const,
+        status: "active" as const
     },
     {
-        title: "Aging Preview",
+        title: "AI Aging Studio",
         description:
-            "Apply an artistic future-look study directly in the browser.",
+            "Generate realistic age progression portraits while preserving identity and composition.",
         href: "/dashboard/aging",
-        label: "Time study"
+        swatch: "aging" as const,
+        status: "active" as const
     },
     {
         title: "Background Remover",
         description:
             "Cut out subjects cleanly for profile, catalog, and studio edits.",
         href: "/dashboard/background",
-        label: "Clean edit"
+        swatch: "background" as const,
+        status: "active" as const
     },
     {
-        title: "Avatar Portraits",
+        title: "Avatar Studio",
         description:
-            "Plan profile-ready portrait variants for social and professional use.",
+            "Plan profile-ready avatar variants for social and professional use.",
         href: "/dashboard/avatar",
-        label: "Avatar set"
+        swatch: "avatar" as const,
+        status: "soon" as const
     },
     {
-        title: "Batch Studio",
+        title: "Style Review",
         description:
-            "Prepare repeatable portrait workflows for multiple images.",
+            "Review planned sketch and style options for future portrait workflows.",
+        href: "/dashboard/styles",
+        swatch: "sketch" as const,
+        status: "soon" as const
+    },
+    {
+        title: "Batch Tools",
+        description:
+            "Prepare multi-image workflows for repeatable portrait processing.",
         href: "/dashboard/batch",
-        label: "Series work"
+        swatch: "batch" as const,
+        status: "soon" as const
+    }
+];
+
+const examples = [
+    {
+        title: "Portrait study 01",
+        description: "A clean before/after frame for the caricature workflow."
+    },
+    {
+        title: "Portrait study 02",
+        description: "A clean before/after frame for the aging workflow."
+    },
+    {
+        title: "Portrait study 03",
+        description: "A clean before/after frame for the background workflow."
     }
 ];
 
 const steps = [
     "Upload a portrait",
-    "Choose a tool and style",
-    "Generate or preview",
+    "Choose a tool and generate",
     "Download and manage history"
 ];
 
@@ -62,7 +94,7 @@ const plans = [
         description: "More generations, unlocked downloads, and advanced controls."
     },
     {
-        name: "Studio/Admin",
+        name: "Studio / Admin",
         price: "Internal",
         description: "Review, dataset, and quality control workflows."
     }
@@ -75,26 +107,33 @@ export default async function Home() {
         data: { user }
     } = await supabase.auth.getUser();
 
+    const startHref = user ? "/dashboard" : "/auth/sign-up";
+
     return (
-        <main className="min-h-screen bg-stone-100 text-neutral-950">
-            <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur">
+        <main className="min-h-screen bg-paper text-ink">
+            <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur">
                 <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4">
-                    <Link href="/" className="text-xl font-black tracking-tight">
-                        PortraitLab Studio
+                    <Link href="/" className="leading-none">
+                        <span className="block font-display text-xl tracking-[-0.01em]">
+                            PortraitLab
+                        </span>
+                        <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-mute">
+                            Studio
+                        </span>
                     </Link>
 
-                    <nav className="hidden items-center gap-8 text-sm font-bold text-neutral-600 md:flex">
-                        <a href="#tools" className="hover:text-black">
+                    <nav className="hidden items-center gap-8 text-sm font-medium text-ink-soft md:flex">
+                        <a href="#tools" className="hover:text-ink">
                             Tools
                         </a>
-                        <a href="#examples" className="hover:text-black">
+                        <a href="#examples" className="hover:text-ink">
                             Examples
                         </a>
-                        <Link href="/pricing" className="hover:text-black">
+                        <Link href="/pricing" className="hover:text-ink">
                             Pricing
                         </Link>
                         {!user && (
-                            <Link href="/auth/sign-in" className="hover:text-black">
+                            <Link href="/auth/sign-in" className="hover:text-ink">
                                 Sign in
                             </Link>
                         )}
@@ -103,44 +142,49 @@ export default async function Home() {
                     <div className="flex items-center gap-3">
                         {user ? (
                             <>
-                                <StudioButton href="/dashboard">Open Studio</StudioButton>
+                                <StudioButton href="/dashboard" size="sm" arrow>
+                                    Open studio
+                                </StudioButton>
                                 <SignOutButton />
                             </>
                         ) : (
-                            <StudioButton href="/auth/sign-up">Open Studio</StudioButton>
+                            <StudioButton href="/auth/sign-up" size="sm" arrow>
+                                Open studio
+                            </StudioButton>
                         )}
                     </div>
                 </div>
             </header>
 
-            <section className="border-b border-neutral-200 bg-white px-5 py-16 md:py-24">
+            <section className="border-b border-line px-5 py-16 md:py-24">
                 <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1fr_0.82fr]">
-                    <div>
-                        <p className="text-xs font-black uppercase tracking-[0.32em] text-neutral-500">
-                            A classic portrait studio powered by modern AI.
-                        </p>
-                        <h1 className="mt-5 max-w-5xl text-6xl font-black leading-[0.92] tracking-tight md:text-8xl">
-                            Classic portrait tools, powered by AI.
+                    <div className="hero-rise">
+                        <Eyebrow>A classic portrait studio powered by modern AI</Eyebrow>
+                        <h1 className="mt-5 max-w-5xl font-display text-6xl leading-[1.02] tracking-[-0.015em] md:text-8xl">
+                            Classic portrait tools, <em className="italic">reimagined</em>.
                         </h1>
-                        <p className="mt-8 max-w-3xl text-xl leading-9 text-neutral-600">
+                        <p className="mt-8 max-w-3xl text-xl leading-9 text-ink-soft">
                             Generate caricatures, preview aging, remove backgrounds and
-                            create avatar-style portraits from one clean studio interface.
+                            create avatar-style portraits from one calm, black-and-white
+                            studio interface.
                         </p>
                         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                            <StudioButton href={user ? "/dashboard" : "/auth/sign-up"} className="px-7 py-4 text-base">
+                            <StudioButton href={startHref} arrow>
                                 Start creating
                             </StudioButton>
-                            <StudioButton href="#examples" variant="secondary" className="px-7 py-4 text-base">
+                            <StudioButton href="#examples" variant="ghost">
                                 View examples
                             </StudioButton>
                         </div>
+                        <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-mute">
+                            Caricature — Aging — Background — Avatar — Batch
+                        </p>
                     </div>
 
-                    <div className="lg:pt-10">
-                        <StudioImageFrame
-                            eyebrow="Editorial preview"
-                            label="Portrait to caricature study"
-                        />
+                    <div className="lg:pt-6">
+                        <Viewfinder metadata="Preset : caricature — 4 : 5">
+                            <HeroCompareSlider />
+                        </Viewfinder>
                     </div>
                 </div>
             </section>
@@ -151,35 +195,38 @@ export default async function Home() {
                         eyebrow="Tools"
                         title="One quiet workspace for portrait edits."
                         description="Each tool keeps the upload, controls, preview, download, and history flow close together."
+                        layout="split"
                     />
 
-                    <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-                        {tools.map((tool, index) => (
+                    <div className="mt-12 border-t border-line">
+                        {tools.map((tool) => (
                             <Link
                                 key={tool.title}
                                 href={tool.href}
-                                className="group flex min-h-full flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white shadow-sm transition hover:-translate-y-1 hover:border-black hover:shadow-xl"
+                                className="group flex items-center justify-between gap-6 border-b border-line px-2 py-6 transition duration-300 ease-studio hover:bg-ink hover:text-paper"
                             >
-                                <div className="aspect-[4/3] border-b border-neutral-200 bg-neutral-100 p-4">
-                                    <div className="flex h-full items-end rounded-lg border border-neutral-300 bg-white p-4">
-                                        <div>
-                                            <p className="font-mono text-xs text-neutral-500">
-                                                0{index + 1}
-                                            </p>
-                                            <p className="mt-2 text-xl font-black">
-                                                {tool.label}
-                                            </p>
-                                        </div>
+                                <div className="flex items-center gap-6">
+                                    <ToolSwatch kind={tool.swatch} />
+                                    <div>
+                                        <h3 className="font-display text-2xl tracking-[-0.01em]">
+                                            {tool.title}
+                                        </h3>
+                                        <p className="mt-1 max-w-xl text-sm leading-6 text-ink-soft group-hover:text-paper/70">
+                                            {tool.description}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="flex flex-1 flex-col p-5">
-                                    <h3 className="text-xl font-black">{tool.title}</h3>
-                                    <p className="mt-3 flex-1 text-sm leading-6 text-neutral-600">
-                                        {tool.description}
-                                    </p>
-                                    <p className="mt-5 text-sm font-black text-neutral-950">
-                                        Open tool
-                                    </p>
+
+                                <div className="flex items-center gap-6">
+                                    <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-mute group-hover:text-paper/70 sm:block">
+                                        {tool.status === "active" ? "Active" : "Coming soon"}
+                                    </span>
+                                    <span
+                                        aria-hidden="true"
+                                        className="inline-block transition-transform duration-300 ease-studio group-hover:translate-x-1"
+                                    >
+                                        →
+                                    </span>
                                 </div>
                             </Link>
                         ))}
@@ -187,116 +234,146 @@ export default async function Home() {
                 </div>
             </section>
 
-            <section id="examples" className="border-y border-neutral-200 bg-white px-5 py-20">
+            <section id="examples" className="border-y border-line px-5 py-20">
                 <div className="mx-auto max-w-7xl">
-                    <StudioSectionHeader
-                        eyebrow="Examples"
-                        title="Before and after, treated like a contact sheet."
-                        description="Neutral image frames keep attention on the portrait transformation."
-                    />
+                    <Reveal>
+                        <StudioSectionHeader
+                            eyebrow="Examples"
+                            title="Before and after, treated like a contact sheet."
+                            description="Neutral image frames keep attention on the portrait transformation."
+                        />
+                    </Reveal>
 
-                    <div className="mt-12 grid gap-5 md:grid-cols-3">
-                        {[1, 2, 3].map((item) => (
-                            <article
-                                key={item}
-                                className="rounded-xl border border-neutral-300 bg-neutral-50 p-4"
-                            >
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="aspect-[3/4] rounded-lg border border-neutral-300 bg-white p-4">
-                                        <div className="h-full rounded-t-full bg-neutral-200" />
-                                    </div>
-                                    <div className="aspect-[3/4] rounded-lg border border-neutral-950 bg-neutral-950 p-4">
-                                        <div className="h-full rounded-t-full bg-white" />
-                                    </div>
-                                </div>
-                                <h3 className="mt-5 text-xl font-black">
-                                    Portrait study #{item}
-                                </h3>
-                                <p className="mt-2 text-sm leading-6 text-neutral-600">
-                                    A clean before/after frame for caricature, aging, and
-                                    background workflows.
-                                </p>
-                            </article>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section id="how-it-works" className="px-5 py-20">
-                <div className="mx-auto max-w-7xl">
-                    <StudioSectionHeader
-                        eyebrow="Process"
-                        title="How it works"
-                        align="center"
-                    />
-                    <div className="mt-12 grid gap-4 md:grid-cols-4">
-                        {steps.map((step, index) => (
-                            <div
-                                key={step}
-                                className="rounded-xl border border-neutral-300 bg-white p-6"
-                            >
-                                <p className="font-mono text-sm text-neutral-500">
-                                    0{index + 1}
-                                </p>
-                                <h3 className="mt-6 text-2xl font-black">{step}</h3>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section className="border-y border-neutral-200 bg-white px-5 py-20">
-                <div className="mx-auto max-w-7xl">
-                    <StudioSectionHeader
-                        eyebrow="Pricing"
-                        title="Simple plans for the studio."
-                        description="The current build keeps payments planned while preserving the account, history, and admin structure."
-                    />
-                    <div className="mt-12 grid gap-5 lg:grid-cols-3">
-                        {plans.map((plan) => (
-                            <article
-                                key={plan.name}
-                                className="rounded-xl border border-neutral-300 bg-white p-7 shadow-sm"
-                            >
-                                <h3 className="text-3xl font-black">{plan.name}</h3>
-                                <p className="mt-6 text-4xl font-black">{plan.price}</p>
-                                <p className="mt-5 leading-7 text-neutral-600">
-                                    {plan.description}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section className="px-5 py-16">
-                <div className="mx-auto max-w-7xl rounded-xl bg-black px-8 py-12 text-white md:px-12">
-                    <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
-                        <div>
-                            <h2 className="text-4xl font-black tracking-tight md:text-6xl">
-                                Open PortraitLab Studio.
-                            </h2>
-                            <p className="mt-4 max-w-2xl text-lg leading-8 text-neutral-300">
-                                Create expressive portraits, clean edits and artistic
-                                transformations.
-                            </p>
+                    <Reveal className="mt-12">
+                        <div className="grid gap-5 md:grid-cols-3">
+                            {examples.map((example, index) => (
+                                <article key={example.title}>
+                                    <Viewfinder metadata={`Study : 0${index + 1} — 4 : 5`}>
+                                        <div className="aspect-[4/5]">
+                                            <StudioImageFrame />
+                                        </div>
+                                    </Viewfinder>
+                                    <h3 className="mt-5 font-display text-2xl tracking-[-0.01em]">
+                                        {example.title}
+                                    </h3>
+                                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                                        {example.description}
+                                    </p>
+                                </article>
+                            ))}
                         </div>
-                        <StudioButton href="/dashboard" variant="light" className="px-7 py-4 text-base">
-                            Go to dashboard
-                        </StudioButton>
-                    </div>
+                    </Reveal>
                 </div>
             </section>
 
-            <footer className="border-t border-neutral-200 bg-white px-5 py-8">
-                <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-neutral-600 md:flex-row">
-                    <p className="font-black text-neutral-950">PortraitLab Studio</p>
-                    <div className="flex gap-5">
-                        <Link href="/pricing">Pricing</Link>
-                        <Link href="/auth/sign-in">Sign in</Link>
-                        <Link href="/dashboard">Studio</Link>
+            <section id="how-it-works" className="bg-ink px-5 py-20 text-paper">
+                <div className="mx-auto max-w-7xl">
+                    <Reveal>
+                        <StudioSectionHeader
+                            eyebrow="Process"
+                            title={<span className="text-paper">How it works</span>}
+                            align="center"
+                        />
+                    </Reveal>
+                    <Reveal>
+                        <div className="mt-12 grid gap-px border border-line-dark bg-line-dark md:grid-cols-3">
+                            {steps.map((step, index) => (
+                                <div key={step} className="bg-ink p-8">
+                                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-paper/50">
+                                        0{index + 1}
+                                    </p>
+                                    <h3 className="mt-6 font-display text-3xl tracking-[-0.01em] text-paper">
+                                        {step}
+                                    </h3>
+                                </div>
+                            ))}
+                        </div>
+                    </Reveal>
+                </div>
+            </section>
+
+            <section className="border-b border-line px-5 py-20">
+                <div className="mx-auto max-w-7xl">
+                    <Reveal>
+                        <div className="grid items-center gap-12 lg:grid-cols-[0.82fr_1fr]">
+                            <Viewfinder metadata="Studio control room — dashboard preview">
+                                <div className="aspect-[4/3]">
+                                    <StudioImageFrame />
+                                </div>
+                            </Viewfinder>
+                            <div>
+                                <Eyebrow>Workspace</Eyebrow>
+                                <h2 className="mt-3 font-display text-4xl leading-[1.05] tracking-[-0.015em] md:text-5xl">
+                                    Choose a portrait workflow.
+                                </h2>
+                                <p className="mt-6 max-w-lg text-lg leading-8 text-ink-soft">
+                                    Upload a photo, generate a result, and review saved
+                                    history from one calm black-and-white workspace.
+                                </p>
+                                <div className="mt-8">
+                                    <StudioButton href={startHref} arrow>
+                                        Open the dashboard
+                                    </StudioButton>
+                                </div>
+                            </div>
+                        </div>
+                    </Reveal>
+                </div>
+            </section>
+
+            <section className="px-5 py-20">
+                <div className="mx-auto max-w-7xl">
+                    <Reveal>
+                        <StudioSectionHeader
+                            eyebrow="Pricing"
+                            title="Simple plans for the studio."
+                            description="The current build keeps payments planned while preserving the account, history, and admin structure."
+                            layout="split"
+                        />
+                    </Reveal>
+                    <Reveal>
+                        <div className="mt-12 grid divide-y divide-line border border-line md:grid-cols-3 md:divide-x md:divide-y-0">
+                            {plans.map((plan) => (
+                                <Link
+                                    key={plan.name}
+                                    href="/pricing"
+                                    className="group block p-8 transition duration-300 ease-studio hover:bg-ink hover:text-paper"
+                                >
+                                    <h3 className="font-display text-3xl tracking-[-0.01em]">
+                                        {plan.name}
+                                    </h3>
+                                    <p className="mt-6 font-display text-4xl tracking-[-0.01em]">
+                                        {plan.price}
+                                    </p>
+                                    <p className="mt-5 leading-7 text-ink-soft group-hover:text-paper/70">
+                                        {plan.description}
+                                    </p>
+                                </Link>
+                            ))}
+                        </div>
+                    </Reveal>
+                </div>
+            </section>
+
+            <footer className="bg-ink px-5 pb-10 pt-16 text-paper">
+                <div className="mx-auto max-w-7xl">
+                    <p className="font-display text-6xl leading-none tracking-[-0.015em] md:text-8xl">
+                        PortraitLab Studio
+                    </p>
+                    <div className="mt-10 flex flex-col justify-between gap-4 border-t border-line-dark pt-6 text-sm text-paper/60 md:flex-row">
+                        <p>Copyright 2026 PortraitLab Studio.</p>
+                        <div className="flex gap-6">
+                            <Link href="/pricing" className="hover:text-paper">
+                                Pricing
+                            </Link>
+                            <Link href="/auth/sign-in" className="hover:text-paper">
+                                Sign in
+                            </Link>
+                            <Link href="/dashboard" className="hover:text-paper">
+                                Studio
+                            </Link>
+                        </div>
                     </div>
-                    <p>Copyright 2026 PortraitLab Studio.</p>
                 </div>
             </footer>
         </main>

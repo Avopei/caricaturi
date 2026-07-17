@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
@@ -9,30 +9,6 @@ type RouteContext = {
         id: string;
     }>;
 };
-
-async function requireAdmin() {
-    const supabase = await createClient();
-
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        throw new Error("UNAUTHORIZED");
-    }
-
-    const { data: profile, error } = await supabaseAdmin
-        .from("profiles")
-        .select("plan")
-        .eq("id", user.id)
-        .single();
-
-    if (error || !profile || profile.plan !== "admin") {
-        throw new Error("FORBIDDEN");
-    }
-
-    return user;
-}
 
 function normalizeRating(value: unknown) {
     if (value === null || value === undefined || value === "") {
@@ -50,7 +26,7 @@ function normalizeRating(value: unknown) {
 
 export async function PATCH(request: Request, context: RouteContext) {
     try {
-        await requireAdmin();
+        await requireAdminApiUser();
 
         const { id } = await context.params;
         const body = await request.json();
@@ -77,18 +53,10 @@ export async function PATCH(request: Request, context: RouteContext) {
             success: true
         });
     } catch (error) {
-        if (error instanceof Error && error.message === "UNAUTHORIZED") {
-            return NextResponse.json(
-                { error: "You must be signed in." },
-                { status: 401 }
-            );
-        }
+        const authResponse = adminAuthErrorResponse(error);
 
-        if (error instanceof Error && error.message === "FORBIDDEN") {
-            return NextResponse.json(
-                { error: "Admin access required." },
-                { status: 403 }
-            );
+        if (authResponse) {
+            return authResponse;
         }
 
         return NextResponse.json(

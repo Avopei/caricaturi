@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
-import type { UserPlan } from "@/types/caricature";
+import type { UserRole } from "@/types/caricature";
 
 export const runtime = "nodejs";
 
@@ -11,30 +11,37 @@ type RouteContext = {
     }>;
 };
 
-function isValidPlan(value: unknown): value is UserPlan {
-    return value === "free" || value === "pro" || value === "studio";
+function isValidRole(value: unknown): value is UserRole {
+    return value === "user" || value === "admin";
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
     try {
-        await requireAdminApiUser();
+        const adminUser = await requireAdminApiUser();
 
         const { id } = await context.params;
         const body = await request.json();
 
-        const plan = body.plan;
+        const role = body.role;
 
-        if (!isValidPlan(plan)) {
+        if (!isValidRole(role)) {
             return NextResponse.json(
-                { error: "Invalid plan value." },
+                { error: "Invalid role value." },
                 { status: 400 }
+            );
+        }
+
+        if (id === adminUser.id && role !== "admin") {
+            return NextResponse.json(
+                { error: "You cannot demote your own admin account." },
+                { status: 403 }
             );
         }
 
         const { error } = await supabaseAdmin
             .from("profiles")
             .update({
-                plan
+                role
             })
             .eq("id", id);
 
@@ -44,7 +51,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
         return NextResponse.json({
             success: true,
-            plan
+            role
         });
     } catch (error) {
         const authResponse = adminAuthErrorResponse(error);
@@ -56,7 +63,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json(
             {
                 error:
-                    error instanceof Error ? error.message : "Could not update plan."
+                    error instanceof Error ? error.message : "Could not update role."
             },
             { status: 500 }
         );

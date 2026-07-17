@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { adminAuthErrorResponse, requireAdminApiUser } from "@/lib/admin";
-import type { UserPlan } from "@/types/caricature";
 
 export const runtime = "nodejs";
 
@@ -11,30 +10,33 @@ type RouteContext = {
     }>;
 };
 
-function isValidPlan(value: unknown): value is UserPlan {
-    return value === "free" || value === "pro" || value === "studio";
-}
-
 export async function PATCH(request: Request, context: RouteContext) {
     try {
-        await requireAdminApiUser();
+        const adminUser = await requireAdminApiUser();
 
         const { id } = await context.params;
         const body = await request.json();
 
-        const plan = body.plan;
+        const isBlocked = body.isBlocked;
 
-        if (!isValidPlan(plan)) {
+        if (typeof isBlocked !== "boolean") {
             return NextResponse.json(
-                { error: "Invalid plan value." },
+                { error: "Invalid isBlocked value." },
                 { status: 400 }
+            );
+        }
+
+        if (id === adminUser.id && isBlocked) {
+            return NextResponse.json(
+                { error: "You cannot block your own account." },
+                { status: 403 }
             );
         }
 
         const { error } = await supabaseAdmin
             .from("profiles")
             .update({
-                plan
+                is_blocked: isBlocked
             })
             .eq("id", id);
 
@@ -44,7 +46,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
         return NextResponse.json({
             success: true,
-            plan
+            isBlocked
         });
     } catch (error) {
         const authResponse = adminAuthErrorResponse(error);
@@ -56,7 +58,9 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json(
             {
                 error:
-                    error instanceof Error ? error.message : "Could not update plan."
+                    error instanceof Error
+                        ? error.message
+                        : "Could not update block status."
             },
             { status: 500 }
         );

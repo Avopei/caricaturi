@@ -2,8 +2,17 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createSignedUrl, uploadFileToStorage } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+    GenerationNotAllowedError,
+    assertCanGenerate,
+    getOrCreateProfile,
+    incrementUsageIfMetered
+} from "@/lib/plan";
 
 export const runtime = "nodejs";
+
+const supabaseAdmin = createSupabaseAdminClient();
 
 export async function POST(request: Request) {
     try {
@@ -19,6 +28,18 @@ export async function POST(request: Request) {
                 { error: "You must be signed in." },
                 { status: 401 }
             );
+        }
+
+        const profile = await getOrCreateProfile(user.id, user.email);
+
+        try {
+            await assertCanGenerate(profile);
+        } catch (error) {
+            if (error instanceof GenerationNotAllowedError) {
+                return NextResponse.json({ error: error.message }, { status: error.status });
+            }
+
+            throw error;
         }
 
         const formData = await request.formData();
@@ -104,6 +125,21 @@ export async function POST(request: Request) {
         });
 
         const resultImage = await createSignedUrl(resultPath);
+
+        const { error: insertError } = await supabaseAdmin.from("generations").insert({
+            id: generationId,
+            user_id: user.id,
+            tool: "background",
+            storage_path: resultPath,
+            status: "completed",
+            model_provider: "remove_bg"
+        });
+
+        if (insertError) {
+            console.error("BACKGROUND_GENERATIONS_INSERT_ERROR", insertError.message);
+        }
+
+        await incrementUsageIfMetered(profile);
 
         return NextResponse.json({
             resultImage,

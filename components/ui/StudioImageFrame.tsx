@@ -1,55 +1,39 @@
 type StudioImageFrameProps = {
-    label: string;
-    eyebrow?: string;
     dark?: boolean;
+    className?: string;
 };
 
-export function StudioImageFrame({
-                                     label,
-                                     eyebrow,
-                                     dark = false
-                                 }: StudioImageFrameProps) {
+export function StudioImageFrame({ dark = false, className = "" }: StudioImageFrameProps) {
     return (
         <div
-            className={`relative overflow-hidden rounded-xl border ${
-                dark
-                    ? "border-white/15 bg-neutral-950 text-white"
-                    : "border-neutral-300 bg-neutral-100 text-neutral-950"
-            }`}
+            className={`relative h-full w-full overflow-hidden ${
+                dark ? "bg-ink text-paper" : "bg-surface text-ink"
+            } ${className}`}
         >
-            <div className="absolute inset-0 opacity-70 [background-image:linear-gradient(90deg,rgba(0,0,0,.08)_1px,transparent_1px),linear-gradient(rgba(0,0,0,.08)_1px,transparent_1px)] [background-size:26px_26px]" />
             <div
-                className={`absolute inset-x-8 top-10 h-48 rounded-full border ${
-                    dark ? "border-white/20 bg-white/5" : "border-black/10 bg-white/70"
+                className={`absolute inset-0 opacity-60 [background-image:linear-gradient(90deg,currentColor_1px,transparent_1px),linear-gradient(currentColor_1px,transparent_1px)] [background-size:26px_26px]`}
+                style={{ opacity: dark ? 0.08 : 0.06 }}
+            />
+            <div
+                className={`absolute inset-x-8 top-8 h-40 border ${
+                    dark ? "border-line-dark" : "border-line"
                 }`}
             />
             <div
-                className={`relative mx-auto mt-16 flex aspect-[3/4] w-2/3 max-w-72 flex-col justify-end overflow-hidden rounded-t-full border ${
-                    dark
-                        ? "border-white/20 bg-neutral-800"
-                        : "border-neutral-300 bg-white"
+                className={`relative mx-auto mt-14 flex aspect-[3/4] w-2/3 max-w-72 flex-col justify-end overflow-hidden border ${
+                    dark ? "border-line-dark bg-ink-soft" : "border-line bg-paper"
                 }`}
             >
                 <div
-                    className={`mx-auto mb-16 h-28 w-28 rounded-full border-8 ${
-                        dark
-                            ? "border-neutral-950 bg-neutral-200"
-                            : "border-white bg-neutral-300"
+                    className={`mx-auto mb-14 h-24 w-24 rounded-full border-8 ${
+                        dark ? "border-ink bg-line-dark" : "border-paper bg-line"
                     }`}
                 />
                 <div
-                    className={`mx-auto h-36 w-52 rounded-t-full ${
-                        dark ? "bg-neutral-200" : "bg-neutral-800"
+                    className={`mx-auto h-32 w-48 rounded-t-full ${
+                        dark ? "bg-line-dark" : "bg-ink-soft"
                     }`}
                 />
-            </div>
-            <div className="relative border-t border-current/10 bg-inherit p-5">
-                {eyebrow && (
-                    <p className="text-xs font-black uppercase tracking-[0.24em] opacity-60">
-                        {eyebrow}
-                    </p>
-                )}
-                <p className="mt-1 text-xl font-black">{label}</p>
             </div>
         </div>
     );
