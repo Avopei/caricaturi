@@ -1,133 +1,115 @@
 import Link from "next/link";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { StudioButton } from "@/components/ui/StudioButton";
+import { getPlanLimits } from "@/lib/plan";
 
-const plans = [
-    {
-        name: "Free",
-        price: "$0",
-        description: "Demo access for testing the main image workflows.",
-        features: [
-            "Free preview flow",
-            "Standard output quality",
-            "Watermarked preview",
-            "Basic caricature styles",
-            "Generation history"
-        ],
-        cta: "Start for free",
-        href: "/auth/sign-up",
-        highlighted: false
-    },
-    {
-        name: "Pro",
-        price: "Planned",
-        description:
-            "A planned plan structure for unlocked downloads and more generation control.",
-        features: [
-            "More generations",
-            "Unlocked image downloads",
-            "Additional style controls",
-            "Regenerate with variations",
-            "Higher-quality export options",
-            "Feedback-assisted iteration"
-        ],
-        cta: "View account",
-        href: "/dashboard/account",
-        highlighted: true
-    },
-    {
-        name: "Admin / Internal",
-        price: "Internal",
-        description:
-            "Admin-only review tools for data checks, feedback review, and quality notes.",
-        features: [
-            "Admin Review",
-            "Dataset review",
-            "Quality notes",
-            "User and generation overview",
-            "Feedback review",
-            "Internal export workflow"
-        ],
-        cta: "Open dashboard",
-        href: "/dashboard",
-        highlighted: false
-    }
-];
+export default async function PricingPage() {
+    const limits = await getPlanLimits();
 
-export default function PricingPage() {
+    const plans = [
+        {
+            name: "Free",
+            price: "$0",
+            description: "Preview the core studio tools with watermarked output.",
+            features: [
+                `${limits.free} generations per month`,
+                "Standard output quality",
+                "Watermarked preview",
+                "Core caricature styles",
+                "Generation history"
+            ],
+            cta: "Start for free",
+            href: "/auth/sign-up"
+        },
+        {
+            name: "Pro",
+            price: "Planned",
+            description: "Full access with unlocked downloads and more control.",
+            features: [
+                limits.pro >= 999 ? "Unlimited generations" : `${limits.pro} generations per month`,
+                "Unlocked image downloads",
+                "Additional style controls",
+                "Regenerate with variations",
+                "Higher-quality export options",
+                "Feedback-assisted iteration"
+            ],
+            cta: "View account",
+            href: "/dashboard/account"
+        }
+    ];
+
     return (
-        <main className="min-h-screen bg-stone-100 px-5 py-8 text-neutral-950">
-            <header className="mx-auto flex max-w-7xl items-center justify-between">
-                <Link href="/" className="text-2xl font-black">
-                    PortraitLab Studio
-                </Link>
-
-                <nav className="flex items-center gap-3">
-                    <Link
-                        href="/"
-                        className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 hover:border-black"
-                    >
-                        Home
+        <main className="min-h-screen bg-paper text-ink">
+            <header className="border-b border-line px-5 py-4">
+                <div className="mx-auto flex max-w-5xl items-center justify-between">
+                    <Link href="/" className="leading-none">
+                        <span className="block font-display text-xl tracking-[-0.01em]">
+                            PortraitLab
+                        </span>
+                        <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-mute">
+                            Studio
+                        </span>
                     </Link>
 
-                    <Link
-                        href="/dashboard"
-                        className="rounded-lg bg-black px-4 py-2 text-sm font-black text-white hover:bg-neutral-800"
-                    >
-                        Studio
-                    </Link>
-                </nav>
+                    <nav className="flex items-center gap-3">
+                        <Link
+                            href="/"
+                            className="border border-line bg-paper px-4 py-2 text-sm font-semibold text-ink-soft transition duration-300 ease-studio hover:border-ink hover:bg-ink hover:text-paper"
+                        >
+                            Home
+                        </Link>
+
+                        <StudioButton href="/dashboard" size="sm" arrow>
+                            Studio
+                        </StudioButton>
+                    </nav>
+                </div>
             </header>
 
-            <section className="mx-auto max-w-7xl py-20">
-                <div className="mx-auto max-w-3xl text-center">
-                    <div className="mb-6 inline-flex rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-600">
-                        Demo plan structure
+            <section className="px-5 py-20">
+                <div className="mx-auto max-w-5xl">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <Eyebrow className="text-center">Pricing</Eyebrow>
+                        <h1 className="mt-3 font-display text-5xl leading-[1.05] tracking-[-0.015em] md:text-6xl">
+                            Simple plans for the studio.
+                        </h1>
+                        <p className="mt-6 text-lg leading-8 text-ink-soft">
+                            Payments are not connected in this build yet — this page shows
+                            the real Free and Pro structure the product will ship with.
+                        </p>
                     </div>
 
-                    <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-                        Simple plans for a portrait studio.
-                    </h1>
+                    <div className="mt-14 grid divide-y divide-line border border-line md:grid-cols-2 md:divide-x md:divide-y-0">
+                        {plans.map((plan) => (
+                            <article key={plan.name} className="group p-8 transition duration-300 ease-studio hover:bg-ink hover:text-paper">
+                                <h2 className="font-display text-3xl tracking-[-0.01em]">
+                                    {plan.name}
+                                </h2>
+                                <p className="mt-3 leading-7 text-ink-soft group-hover:text-paper/70">
+                                    {plan.description}
+                                </p>
+                                <p className="mt-8 font-display text-5xl tracking-[-0.01em]">
+                                    {plan.price}
+                                </p>
 
-                    <p className="mt-6 text-lg leading-8 text-neutral-600">
-                        Payments are not connected in this portfolio build. This page shows
-                        the planned Free, Pro, and internal admin structure.
-                    </p>
-                </div>
+                                <ul className="mt-8 space-y-3">
+                                    {plan.features.map((feature) => (
+                                        <li key={feature} className="flex gap-3 text-sm text-ink-soft group-hover:text-paper/70">
+                                            <span className="font-semibold">—</span>
+                                            <span>{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
 
-                <div className="mt-14 grid gap-6 lg:grid-cols-3">
-                    {plans.map((plan) => (
-                        <article
-                            key={plan.name}
-                            className={
-                                plan.highlighted
-                                    ? "rounded-xl border border-black bg-white p-8 shadow-xl"
-                                    : "rounded-xl border border-neutral-300 bg-white p-8 shadow-sm"
-                            }
-                        >
-                            <h2 className="text-3xl font-black">{plan.name}</h2>
-                            <p className="mt-2 leading-7 text-neutral-600">{plan.description}</p>
-                            <p className="mt-8 text-5xl font-black">{plan.price}</p>
-
-                            <ul className="mt-8 space-y-4">
-                                {plan.features.map((feature) => (
-                                    <li key={feature} className="flex gap-3 text-neutral-700">
-                                        <span className="font-black">-</span>
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <Link
-                                href={plan.href}
-                                className={
-                                    plan.highlighted
-                                        ? "mt-8 inline-flex w-full justify-center rounded-lg bg-black px-6 py-4 font-black text-white hover:bg-neutral-800"
-                                        : "mt-8 inline-flex w-full justify-center rounded-lg border border-neutral-300 px-6 py-4 font-black text-neutral-950 hover:border-black"
-                                }
-                            >
-                                {plan.cta}
-                            </Link>
-                        </article>
-                    ))}
+                                <Link
+                                    href={plan.href}
+                                    className="mt-8 inline-flex w-full justify-center border border-ink bg-ink px-6 py-4 text-sm font-semibold text-paper transition duration-300 ease-studio group-hover:border-paper group-hover:bg-paper group-hover:text-ink"
+                                >
+                                    {plan.cta}
+                                </Link>
+                            </article>
+                        ))}
+                    </div>
                 </div>
             </section>
         </main>

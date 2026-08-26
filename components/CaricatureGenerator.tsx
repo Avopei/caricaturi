@@ -67,7 +67,9 @@ export function CaricatureGenerator() {
     const [planInfo, setPlanInfo] = useState<ProfilePlanInfo | null>(null);
     const [planLoading, setPlanLoading] = useState(true);
 
-    const isPro = planInfo ? planInfo.plan !== "free" : false;
+    const isPro = planInfo
+        ? planInfo.plan !== "free" || planInfo.role === "admin"
+        : false;
 
     const stats = useMemo(() => {
         const total = generations.length;

@@ -24,6 +24,7 @@ export async function GET() {
 
         const info: ProfilePlanInfo = {
             plan: profile.plan,
+            role: profile.role,
             freeGenerationsUsed: profile.free_generations_used,
             freeGenerationLimit: await effectiveLimit(profile),
             remainingFreeGenerations: await remainingGenerations(profile)

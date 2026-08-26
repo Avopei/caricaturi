@@ -12,7 +12,7 @@ type RouteContext = {
 };
 
 function isValidPlan(value: unknown): value is UserPlan {
-    return value === "free" || value === "pro" || value === "studio";
+    return value === "free" || value === "pro";
 }
 
 export async function PATCH(request: Request, context: RouteContext) {

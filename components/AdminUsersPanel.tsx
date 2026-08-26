@@ -195,7 +195,6 @@ export function AdminUsersPanel() {
                                         >
                                             <option value="free">free</option>
                                             <option value="pro">pro</option>
-                                            <option value="studio">studio</option>
                                         </select>
                                     </td>
 

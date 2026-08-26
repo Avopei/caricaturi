@@ -7,7 +7,6 @@ export const runtime = "nodejs";
 type AppSettings = {
     freePlanLimit: number;
     proPlanLimit: number;
-    studioPlanLimit: number;
 };
 
 function isValidLimit(value: unknown): value is number {
@@ -20,7 +19,7 @@ export async function GET() {
 
         const { data, error } = await supabaseAdmin
             .from("app_settings")
-            .select("free_plan_limit, pro_plan_limit, studio_plan_limit")
+            .select("free_plan_limit, pro_plan_limit")
             .eq("id", 1)
             .single();
 
@@ -30,8 +29,7 @@ export async function GET() {
 
         const settings: AppSettings = {
             freePlanLimit: data.free_plan_limit,
-            proPlanLimit: data.pro_plan_limit,
-            studioPlanLimit: data.studio_plan_limit
+            proPlanLimit: data.pro_plan_limit
         };
 
         return NextResponse.json(settings);
@@ -60,13 +58,9 @@ export async function PATCH(request: Request) {
 
         const body = await request.json();
 
-        const { freePlanLimit, proPlanLimit, studioPlanLimit } = body;
+        const { freePlanLimit, proPlanLimit } = body;
 
-        if (
-            !isValidLimit(freePlanLimit) ||
-            !isValidLimit(proPlanLimit) ||
-            !isValidLimit(studioPlanLimit)
-        ) {
+        if (!isValidLimit(freePlanLimit) || !isValidLimit(proPlanLimit)) {
             return NextResponse.json(
                 { error: "All plan limits must be non-negative integers." },
                 { status: 400 }
@@ -77,8 +71,7 @@ export async function PATCH(request: Request) {
             .from("app_settings")
             .update({
                 free_plan_limit: freePlanLimit,
-                pro_plan_limit: proPlanLimit,
-                studio_plan_limit: studioPlanLimit
+                pro_plan_limit: proPlanLimit
             })
             .eq("id", 1);
 
@@ -89,8 +82,7 @@ export async function PATCH(request: Request) {
         return NextResponse.json({
             success: true,
             freePlanLimit,
-            proPlanLimit,
-            studioPlanLimit
+            proPlanLimit
         });
     } catch (error) {
         const authResponse = adminAuthErrorResponse(error);

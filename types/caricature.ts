@@ -25,7 +25,7 @@ export type GenerationPaymentStatus = "unpaid" | "paid";
 
 export type FeedbackRating = "good" | "needs_improvement";
 
-export type UserPlan = "free" | "pro" | "studio";
+export type UserPlan = "free" | "pro";
 
 export type UserRole = "user" | "admin";
 
@@ -89,6 +89,7 @@ export type LocalGeneration = {
 
 export type ProfilePlanInfo = {
     plan: UserPlan;
+    role: UserRole;
     freeGenerationsUsed: number;
     freeGenerationLimit: number;
     remainingFreeGenerations: number;

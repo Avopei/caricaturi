@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 type Settings = {
     freePlanLimit: number;
     proPlanLimit: number;
-    studioPlanLimit: number;
 };
 
 export function AdminSettingsForm() {
@@ -89,8 +88,7 @@ export function AdminSettingsForm() {
 
     const fields: Array<{ key: keyof Settings; label: string }> = [
         { key: "freePlanLimit", label: "Free plan monthly limit" },
-        { key: "proPlanLimit", label: "Pro plan monthly limit" },
-        { key: "studioPlanLimit", label: "Studio plan monthly limit" }
+        { key: "proPlanLimit", label: "Pro plan monthly limit" }
     ];
 
     return (

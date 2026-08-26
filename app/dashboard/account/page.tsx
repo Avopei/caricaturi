@@ -1,8 +1,20 @@
 import { DashboardShell } from "@/components/DashboardShell";
 import { requireUser } from "@/lib/auth";
+import { getProfile } from "@/lib/profile";
 import { ProWaitlistButton } from "@/components/ProWaitlistButton";
+
+const planLabel: Record<string, string> = {
+    free: "Free",
+    pro: "Pro",
+    studio: "Studio"
+};
+
 export default async function AccountPage() {
     const user = await requireUser();
+    const profile = await getProfile();
+
+    const isAdmin = profile?.role === "admin";
+    const plan = profile ? planLabel[profile.plan] ?? profile.plan : "Free";
 
     return (
         <DashboardShell email={user.email}>
@@ -35,9 +47,33 @@ export default async function AccountPage() {
                         <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-5">
                             <p className="text-sm font-bold text-neutral-500">Current plan</p>
                             <p className="mt-2 text-lg font-black text-neutral-950">
-                                Free / Development
+                                {plan}
+                                {isAdmin ? " — Admin (unlimited access)" : ""}
                             </p>
                         </div>
+
+                        {!isAdmin && profile && profile.plan === "free" && (
+                            <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-5">
+                                <p className="text-sm font-bold text-neutral-500">
+                                    Free generations used
+                                </p>
+                                <p className="mt-2 text-lg font-black text-neutral-950">
+                                    {profile.freeGenerationsUsed}
+                                    {profile.freeGenerationsLimit !== null
+                                        ? ` / ${profile.freeGenerationsLimit}`
+                                        : ""}
+                                </p>
+                            </div>
+                        )}
+
+                        {profile?.isBlocked && (
+                            <div className="rounded-xl border border-red-300 bg-red-50 p-5">
+                                <p className="text-sm font-bold text-red-700">
+                                    Your account has been blocked. Contact support if you
+                                    believe this is a mistake.
+                                </p>
+                            </div>
+                        )}
 
                         <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-5">
                             <p className="text-sm font-bold text-neutral-500">

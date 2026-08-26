@@ -14,6 +14,13 @@ export type ProfileRow = {
 const PROFILE_COLUMNS =
     "id, plan, role, is_blocked, free_generations_used, free_generations_limit";
 
+/** Only "free" and "pro" are real plan tiers; any other stored value (e.g. a
+ *  legacy "studio" row) is treated as "pro" so it can never crash a limit
+ *  lookup or a plan selector. */
+function normalizePlan(plan: string): UserPlan {
+    return plan === "free" ? "free" : "pro";
+}
+
 export class GenerationNotAllowedError extends Error {
     status: number;
 
@@ -26,22 +33,20 @@ export class GenerationNotAllowedError extends Error {
 export async function getPlanLimits(): Promise<{
     free: number;
     pro: number;
-    studio: number;
 }> {
     const { data, error } = await supabaseAdmin
         .from("app_settings")
-        .select("free_plan_limit, pro_plan_limit, studio_plan_limit")
+        .select("free_plan_limit, pro_plan_limit")
         .eq("id", 1)
         .single();
 
     if (error || !data) {
-        return { free: 3, pro: 999, studio: 999 };
+        return { free: 3, pro: 999 };
     }
 
     return {
         free: data.free_plan_limit,
-        pro: data.pro_plan_limit,
-        studio: data.studio_plan_limit
+        pro: data.pro_plan_limit
     };
 }
 
@@ -119,7 +124,7 @@ export async function getOrCreateProfile(
         .single();
 
     if (!error && data) {
-        return data as ProfileRow;
+        return { ...data, plan: normalizePlan(data.plan) } as ProfileRow;
     }
 
     const { data: created, error: createError } = await supabaseAdmin
@@ -137,5 +142,5 @@ export async function getOrCreateProfile(
         throw new Error(createError?.message || "Could not load or create profile.");
     }
 
-    return created as ProfileRow;
+    return { ...created, plan: normalizePlan(created.plan) } as ProfileRow;
 }

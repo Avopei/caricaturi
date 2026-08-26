@@ -1,9 +1,7 @@
 import "server-only";
-import { cache } from "react";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getProfile } from "@/lib/profile";
 
 export type AdminUser = {
     id: string;
@@ -19,54 +17,34 @@ export class AdminAuthError extends Error {
     }
 }
 
-const loadAdminProfile = cache(async () => {
-    const supabase = await createClient();
-
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        return { user: null, isAdmin: false };
-    }
-
-    const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-    return { user, isAdmin: profile?.role === "admin" };
-});
-
 /** For Server Components / layouts — redirects instead of throwing. */
 export async function requireAdminUser(): Promise<AdminUser> {
-    const { user, isAdmin } = await loadAdminProfile();
+    const profile = await getProfile();
 
-    if (!user) {
+    if (!profile) {
         redirect("/auth/sign-in");
     }
 
-    if (!isAdmin) {
+    if (profile.role !== "admin") {
         redirect("/dashboard");
     }
 
-    return { id: user.id, email: user.email ?? null };
+    return { id: profile.id, email: profile.email };
 }
 
 /** For Route Handlers — throws AdminAuthError so callers can map it to a JSON response. */
 export async function requireAdminApiUser(): Promise<AdminUser> {
-    const { user, isAdmin } = await loadAdminProfile();
+    const profile = await getProfile();
 
-    if (!user) {
+    if (!profile) {
         throw new AdminAuthError("You must be signed in.", 401);
     }
 
-    if (!isAdmin) {
+    if (profile.role !== "admin") {
         throw new AdminAuthError("Admin access required.", 403);
     }
 
-    return { id: user.id, email: user.email ?? null };
+    return { id: profile.id, email: profile.email };
 }
 
 export function adminAuthErrorResponse(error: unknown) {

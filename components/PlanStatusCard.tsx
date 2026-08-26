@@ -24,7 +24,7 @@ export function PlanStatusCard({ planInfo, loading }: PlanStatusCardProps) {
         );
     }
 
-    const isPro = planInfo.plan !== "free";
+    const isPro = planInfo.plan !== "free" || planInfo.role === "admin";
 
     return (
         <div className="rounded-xl border border-neutral-300 bg-white p-5 shadow-sm">

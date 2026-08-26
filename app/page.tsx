@@ -92,11 +92,6 @@ const plans = [
         name: "Pro",
         price: "Planned",
         description: "More generations, unlocked downloads, and advanced controls."
-    },
-    {
-        name: "Studio / Admin",
-        price: "Internal",
-        description: "Review, dataset, and quality control workflows."
     }
 ];
 
@@ -332,7 +327,7 @@ export default async function Home() {
                         />
                     </Reveal>
                     <Reveal>
-                        <div className="mt-12 grid divide-y divide-line border border-line md:grid-cols-3 md:divide-x md:divide-y-0">
+                        <div className="mt-12 grid divide-y divide-line border border-line md:grid-cols-2 md:divide-x md:divide-y-0">
                             {plans.map((plan) => (
                                 <Link
                                     key={plan.name}
