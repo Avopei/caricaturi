@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("react", () => ({
-  cache: (fn: Function) => fn,
+  cache: <T extends (...args: unknown[]) => unknown>(fn: T): T => fn,
 }));
 
 const mockRedirect = vi.fn((url: string) => {
