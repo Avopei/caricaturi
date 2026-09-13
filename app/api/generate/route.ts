@@ -8,6 +8,7 @@ import {
     uploadFileToStorage
 } from "@/lib/storage";
 import { buildCaricaturePrompt } from "@/lib/ai/prompts";
+import { validateIntensity, validateStyle } from "@/lib/generate-validations";
 import {
     GenerationNotAllowedError,
     assertCanGenerate,
@@ -16,11 +17,6 @@ import {
     remainingGenerations
 } from "@/lib/plan";
 
-import type {
-    CaricatureIntensity,
-    CaricatureStyle
-} from "@/types/caricature";
-
 export const runtime = "nodejs";
 
 const supabaseAdmin = createSupabaseAdminClient();
@@ -28,41 +24,6 @@ const supabaseAdmin = createSupabaseAdminClient();
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
-
-const allowedStyles: CaricatureStyle[] = [
-    "realistic_human_drawn",
-    "classic_line_art",
-    "black_white_sketch",
-    "street_caricature",
-    "classic_color",
-    "comic_caricature"
-];
-
-const allowedIntensities: CaricatureIntensity[] = ["low", "medium", "high"];
-
-function validateStyle(value: FormDataEntryValue | null): CaricatureStyle {
-    if (typeof value !== "string") {
-        return "realistic_human_drawn";
-    }
-
-    if (allowedStyles.includes(value as CaricatureStyle)) {
-        return value as CaricatureStyle;
-    }
-
-    return "realistic_human_drawn";
-}
-
-function validateIntensity(value: FormDataEntryValue | null): CaricatureIntensity {
-    if (typeof value !== "string") {
-        return "low";
-    }
-
-    if (allowedIntensities.includes(value as CaricatureIntensity)) {
-        return value as CaricatureIntensity;
-    }
-
-    return "low";
-}
 
 function getExtensionFromContentType(contentType: string) {
     if (contentType.includes("png")) return "png";

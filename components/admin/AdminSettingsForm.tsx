@@ -16,30 +16,27 @@ export function AdminSettingsForm() {
     const [savedMessage, setSavedMessage] = useState("");
 
     useEffect(() => {
+        async function loadSettings() {
+            try {
+                const response = await fetch("/api/admin/settings");
+                const data: Settings & { error?: string } = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Could not load settings.");
+                }
+
+                setSettings(data);
+            } catch (error) {
+                setErrorMessage(
+                    error instanceof Error ? error.message : "Could not load settings."
+                );
+            } finally {
+                setLoading(false);
+            }
+        }
+
         loadSettings();
     }, []);
-
-    async function loadSettings() {
-        setLoading(true);
-        setErrorMessage("");
-
-        try {
-            const response = await fetch("/api/admin/settings");
-            const data: Settings & { error?: string } = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "Could not load settings.");
-            }
-
-            setSettings(data);
-        } catch (error) {
-            setErrorMessage(
-                error instanceof Error ? error.message : "Could not load settings."
-            );
-        } finally {
-            setLoading(false);
-        }
-    }
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
